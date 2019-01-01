@@ -84,7 +84,12 @@ append-local-to-path: $(HOME)/.profile
 	fi
 
 $(HOME)/.profile: $(HOME)/.profile.orig
-	cp $< $@
+	echo "# This file is generated from $< by the" >> $@
+	echo "# provisioning script. If you modify this file, your modifications" >> $@
+	echo "# will be undone during the next run of that script." >> $@
+	echo >> $@
+	cat $< >> $@
+	echo >> $@
 
 $(HOME)/.profile.orig:
 	if [ -s $(HOME)/.profile ]; then \
