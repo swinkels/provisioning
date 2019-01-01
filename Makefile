@@ -3,7 +3,7 @@ LOCAL_GITHUB_REPOS_DIR=$(HOME)/repos/github.com
 
 all: spacemacs-config
 
-.PHONY: depends install-emacs-dependencies
+.PHONY: depends install-emacs-dependencies append-local-to-path
 
 depends: install-emacs-dependencies
 	sudo apt-get install arc-theme fonts-noto
@@ -51,7 +51,7 @@ $(LOCAL_GITHUB_REPOS_DIR)/oje: | $(LOCAL_GITHUB_REPOS_DIR)
 	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/swinkels/oje.git
 
 fonts: $(LOCAL_FONTS_DIR)/source-code-pro
-	
+
 $(LOCAL_FONTS_DIR)/source-code-pro: $(LOCAL_GITHUB_REPOS_DIR)/source-code-pro | $(LOCAL_FONTS_DIR)
 	ln -s $< $@
 	fc-cache -f -v $@
@@ -59,7 +59,7 @@ $(LOCAL_FONTS_DIR)/source-code-pro: $(LOCAL_GITHUB_REPOS_DIR)/source-code-pro | 
 $(LOCAL_GITHUB_REPOS_DIR)/source-code-pro: | $(LOCAL_GITHUB_REPOS_DIR)
 	cd $< && git clone --branch release --depth 1 https://github.com/adobe-fonts/source-code-pro.git
 
-CAPS_TO_CTRL_COMMAND="setxkbmap -option compose:rctrl -option ctrl:nocaps" 
+CAPS_TO_CTRL_COMMAND="setxkbmap -option compose:rctrl -option ctrl:nocaps"
 
 set-caps-to-ctrl: $(HOME)/.xprofile
 	if ! grep -q $(CAPS_TO_CTRL_COMMAND) $<; then echo $(CAPS_TO_CTRL_COMMAND) >> $<; fi
@@ -73,7 +73,26 @@ $(HOME)/.xprofile.orig:
 	else \
 		touch $(HOME)/.xprofile.orig ; \
 	fi
-	
+
+LOCAL_BIN=\$$HOME/.local/bin
+LOCAL_DIR_MARKER="PATH=\"$(LOCAL_BIN)"
+LOCAL_DIR_LINES=if [ -d \"$(LOCAL_BIN)\" ]; then PATH=\"$(LOCAL_BIN):\$$PATH\"; fi
+
+append-local-to-path: $(HOME)/.profile
+	if ! grep -q $(LOCAL_DIR_MARKER) $<; then \
+		echo "$(LOCAL_DIR_LINES)" >> $< ; \
+	fi
+
+$(HOME)/.profile: $(HOME)/.profile.orig
+	cp $< $@
+
+$(HOME)/.profile.orig:
+	if [ -s $(HOME)/.profile ]; then \
+		cp $(HOME)/.profile $(HOME)/.profile.orig ; \
+	else \
+		touch $(HOME)/.profile.orig ; \
+	fi
+
 desktop-look:
 	xfconf-query -c xsettings -p /Net/ThemeName -s "Arc-Dark"
 	xfconf-query -c xfwm4 -p /general/theme -s "Arc-Dark"
