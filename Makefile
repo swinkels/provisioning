@@ -59,6 +59,18 @@ $(LOCAL_FONTS_DIR)/source-code-pro: $(LOCAL_GITHUB_REPOS_DIR)/source-code-pro | 
 $(LOCAL_GITHUB_REPOS_DIR)/source-code-pro: | $(LOCAL_GITHUB_REPOS_DIR)
 	cd $< && git clone --branch release --depth 1 https://github.com/adobe-fonts/source-code-pro.git
 
+zsh-config: | $(HOME)/.oh-my-zsh
+	@echo Set login shell of the current user to zsh. This requires you to enter
+	@echo your password and a logout \& login.
+	chsh -s $(shell which zsh)
+
+$(HOME)/.oh-my-zsh: $(HOME)/tmp/install-oh-my-zsh.sh
+	sh $(HOME)/tmp/install-oh-my-zsh.sh
+
+$(HOME)/tmp/install-oh-my-zsh.sh: | $(HOME)/tmp
+	curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh > $(HOME)/tmp/install-oh-my-zsh.sh
+	sed -i '/^.*env zsh -l/d' $(HOME)/tmp/install-oh-my-zsh.sh
+
 CAPS_TO_CTRL_COMMAND="setxkbmap -option compose:rctrl -option ctrl:nocaps"
 
 set-caps-to-ctrl: $(HOME)/.xprofile
