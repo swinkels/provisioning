@@ -59,6 +59,29 @@ $(LOCAL_FONTS_DIR)/source-code-pro: $(LOCAL_GITHUB_REPOS_DIR)/source-code-pro | 
 $(LOCAL_GITHUB_REPOS_DIR)/source-code-pro: | $(LOCAL_GITHUB_REPOS_DIR)
 	cd $< && git clone --branch release --depth 1 https://github.com/adobe-fonts/source-code-pro.git
 
+python-dev: | $(HOME)/.local $(HOME)/tmp
+	curl -fsSL https://bootstrap.pypa.io/get-pip.py > $(HOME)/tmp/get-pip.py
+	python $(HOME)/tmp/get-pip.py --user
+	python3 $(HOME)/tmp/get-pip.py --user
+	pip install --user --upgrade virtualenvwrapper
+
+WRAPPER_MARKER=virtualenvwrapper,
+
+install-zsh-plugin-virtualenvwrapper: $(HOME)/.zshrc
+	if ! grep -q "$(WRAPPER_MARKER)" $<; then \
+		sed -i -r 's/(^plugins=\($$)/\1\n  $(WRAPPER_MARKER)/' $(HOME)/.zshrc ; \
+	fi
+
+$(HOME)/.zshrc: $(HOME)/.zshrc.orig
+	cp $< $@
+
+$(HOME)/.zshrc.orig:
+	if [ -s $(HOME)/.zshrc ]; then \
+		cp $(HOME)/.zshrc $(HOME)/.zshrc.orig ; \
+	else \
+		touch $(HOME)/.zshrc.orig ; \
+	fi
+
 zsh-config: | $(HOME)/.oh-my-zsh
 	@echo Set login shell of the current user to zsh. This requires you to enter
 	@echo your password and a logout \& login.
