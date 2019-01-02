@@ -119,9 +119,9 @@ append-local-to-path: $(HOME)/.profile
 	fi
 
 $(HOME)/.profile: $(HOME)/.profile.orig
-	echo "# This file is generated from $< by the" >> $@
+	echo "# This file is generated from $< by the" > $@
 	echo "# provisioning script. If you modify this file, your modifications" >> $@
-	echo "# will be undone during the next run of that script." >> $@
+	echo "# can be undone during the next run of that script." >> $@
 	echo >> $@
 	cat $< >> $@
 	echo >> $@
