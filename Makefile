@@ -145,5 +145,37 @@ desktop-look:
 	xfconf-query -c xsettings -p /Xft/HintStyle -s "hintmedium"
 	xfconf-query -c xsettings -p /Xft/RGBA -s "rgba"
 
+BROWSER_MARKER=WebBrowser=
+BROWSER=firefox
+TERMINAL_MARKER=TerminalEmulator=
+TERMINAL=xfce4-terminal
+
+set-preferred-applications: $(HOME)/.config/xfce4/helpers.rc
+	if grep -q "$(BROWSER_MARKER)" $<; then \
+		sed -i -r 's/(^$(BROWSER_MARKER))(.*)/\1$(BROWSER)/' $< ; \
+	else \
+		echo "$(BROWSER_MARKER)$(BROWSER)" >> $< ; \
+	fi
+	if grep -q "$(TERMINAL_MARKER)" $<; then \
+		sed -i -r 's/(^$(TERMINAL_MARKER))(.*)/\1$(TERMINAL)/' $< ; \
+	else \
+		echo "$(TERMINAL_MARKER)$(TERMINAL)" >> $< ; \
+	fi
+
+$(HOME)/.config/xfce4/helpers.rc: $(HOME)/.config/xfce4/helpers.rc.orig
+	echo "# This file is generated from $< by the" > $@
+	echo "# provisioning script. If you modify this file, your modifications" >> $@
+	echo "# can be undone during the next run of that script." >> $@
+	echo >> $@
+	cat $< >> $@
+	echo >> $@
+
+$(HOME)/.config/xfce4/helpers.rc.orig:
+	if [ -s $(HOME)/.config/xfce4/helpers.rc ]; then \
+		cp $(HOME)/.config/xfce4/helpers.rc $@ ; \
+	else \
+		touch $@ ; \
+	fi
+
 $(HOME)/.local $(LOCAL_FONTS_DIR) $(HOME)/tmp $(HOME)/external_software $(LOCAL_GITHUB_REPOS_DIR):
 	mkdir -p $@
