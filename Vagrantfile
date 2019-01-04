@@ -46,7 +46,7 @@ Vagrant.configure(2) do |config|
   config.vm.provider "virtualbox" do |vb|
     # Display the VirtualBox GUI when booting the machine
     vb.gui = true
- 
+
     # Customize the amount of memory on the VM:
     vb.memory = "4096"
 
@@ -56,6 +56,14 @@ Vagrant.configure(2) do |config|
     config.vm.provision "shell", inline: "sudo apt-get update"
     # Install virtualbox additions
     config.vm.provision "shell", inline: "sudo apt-get install -y virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11"
+  end
+
+  config.vm.provider "libvirt" do |vb|
+    # Customize the amount of memory on the VM:
+    vb.memory = 4096
+    vb.graphics_type = "spice"
+    vb.video_type = "qxl"
+    vb.video_vram = 131072
   end
   #
   # View the documentation for the provider you are using for more
