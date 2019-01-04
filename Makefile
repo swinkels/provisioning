@@ -179,3 +179,12 @@ $(HOME)/.config/xfce4/helpers.rc.orig:
 
 $(HOME)/.local $(LOCAL_FONTS_DIR) $(HOME)/tmp $(HOME)/external_software $(LOCAL_GITHUB_REPOS_DIR):
 	mkdir -p $@
+
+install-vagrant: $(HOME)/tmp/vagrant_2.2.2_x86_64.deb
+	sudo dpkg -i $<
+	vagrant plugin install vagrant-mutate
+	vagrant plugin install vagrant-libvirt
+	vagrant plugin install nokogiri
+
+$(HOME)/tmp/vagrant_2.2.2_x86_64.deb:
+	wget -P $(HOME)/tmp https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.deb
