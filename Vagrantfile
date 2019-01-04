@@ -53,9 +53,9 @@ Vagrant.configure(2) do |config|
     # Customize the amount of video memory:
     vb.customize ["modifyvm", :id, "--vram", "128"]
 
-    config.vm.provision "shell", inline: "sudo apt-get update"
+    # config.vm.provision "shell", inline: "sudo apt-get update"
     # Install virtualbox additions
-    config.vm.provision "shell", inline: "sudo apt-get install -y virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11"
+    # config.vm.provision "shell", inline: "sudo apt-get install -y virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11"
   end
 
   config.vm.provider "libvirt" do |vb|
