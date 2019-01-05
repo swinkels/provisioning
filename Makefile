@@ -8,6 +8,10 @@ all: spacemacs-config
 depends: install-emacs-dependencies
 	sudo apt-get install arc-theme fonts-noto
 
+fix-sources-list:
+	sudo sed -i -r 's/^# (deb-src http.* bionic main restricted.*)/\1/' /etc/apt/sources.list
+	sudo apt-get update
+
 install-emacs-dependencies:
 	sudo apt-get install build-essential
 	sudo apt-get build-dep emacs25
