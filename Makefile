@@ -25,7 +25,7 @@ $(HOME)/external_software/$(EMACS_NAME): $(HOME)/tmp/$(EMACS_ARCHIVE) | $(HOME)/
 	tar xvf $< -C $(HOME)/external_software
 
 $(HOME)/tmp/$(EMACS_ARCHIVE): | $(HOME)/tmp
-	cd $< && wget --timestamping http://ftp.snt.utwente.nl/pub/software/gnu/emacs/$(EMACS_ARCHIVE)
+	cd $(HOME)/tmp && wget --timestamping http://ftp.snt.utwente.nl/pub/software/gnu/emacs/$(EMACS_ARCHIVE)
 
 emacs-clean:
 	- cd $(HOME)/external_software/$(EMACS_NAME) && make uninstall
