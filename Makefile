@@ -152,6 +152,11 @@ desktop-look:
 	xfconf-query -c xsettings -p /Xft/RGBA -s "rgba"
 	xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 24
 
+install-community-wallpapers: /usr/share/xfce4/backgrounds
+
+/usr/share/xfce4/backgrounds:
+	sudo apt-get install xubuntu-community-wallpapers
+
 BROWSER_MARKER=WebBrowser=
 BROWSER=firefox
 TERMINAL_MARKER=TerminalEmulator=
