@@ -138,16 +138,19 @@ $(HOME)/.profile.orig:
 	fi
 
 desktop-look:
-	xfconf-query -c xsettings -p /Net/ThemeName -s "Arc-Dark"
 	xfconf-query -c xfwm4 -p /general/theme -s "Arc-Dark"
-	xfconf-query -c xfwm4 -p /general/title-font -s "Noto Sans Bold 9"
-	xfconf-query -c xfwm4 -p /Gtk/FontName -s "Noto Sans 9"
+	xfconf-query -c xfwm4 -p /general/title_font -s "Noto Sans Bold 9"
+	xfconf-query -c xfwm4 -p /general/cycle_workspaces -s false
+	xfconf-query -c xfwm4 -p /general/cycle_tabwin_mode -s 1
+	xfconf-query -c xsettings -p /Net/ThemeName -s "Arc-Dark"
+	xfconf-query -c xsettings -p /Gtk/FontName -s "Noto Sans 9"
 	xfconf-query -c xsettings -p /Xfce/LastCustomDPI -s 101
-	xfconf-query -c xsettings -p /Xft/AntiAlias -s 1
+	xfconf-query -c xsettings -p /Xft/Antialias -s 1
 	xfconf-query -c xsettings -p /Xft/DPI -s 101
 	xfconf-query -c xsettings -p /Xft/Hinting -s 1
 	xfconf-query -c xsettings -p /Xft/HintStyle -s "hintmedium"
 	xfconf-query -c xsettings -p /Xft/RGBA -s "rgba"
+	xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 24
 
 BROWSER_MARKER=WebBrowser=
 BROWSER=firefox
