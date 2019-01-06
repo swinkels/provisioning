@@ -58,12 +58,12 @@ Vagrant.configure(2) do |config|
     # config.vm.provision "shell", inline: "sudo apt-get install -y virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11"
   end
 
-  config.vm.provider "libvirt" do |vb|
-    # Customize the amount of memory on the VM:
-    vb.memory = 4096
-    vb.graphics_type = "spice"
-    vb.video_type = "qxl"
-    vb.video_vram = 131072
+  config.vm.provider "libvirt" do |libvirt|
+    libvirt.storage_pool_name = "kvm-pool"
+    libvirt.memory = 4096
+    libvirt.graphics_type = "spice"
+    libvirt.video_type = "qxl"
+    libvirt.video_vram = 131072
   end
   #
   # View the documentation for the provider you are using for more
