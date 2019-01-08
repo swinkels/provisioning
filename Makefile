@@ -6,7 +6,6 @@ all: spacemacs-config
 .PHONY: depends install-emacs-dependencies append-local-to-path
 
 depends: install-emacs-dependencies
-	sudo apt-get install arc-theme fonts-noto
 
 fix-sources-list:
 	sudo sed -i -r 's/^# (deb-src http.* bionic main restricted.*)/\1/' /etc/apt/sources.list
@@ -146,18 +145,19 @@ x220-add-fullscreen-to-vm: /etc/X11/xorg.conf.d/40-x220.conf
 	sudo mkdir -p $@
 
 desktop-look:
+	sudo apt-get install arc-theme fonts-noto
 	xfconf-query -c xfwm4 -p /general/theme -s "Arc-Dark"
 	xfconf-query -c xfwm4 -p /general/title_font -s "Noto Sans Bold 9"
 	xfconf-query -c xfwm4 -p /general/cycle_workspaces -s false
 	xfconf-query -c xfwm4 -p /general/cycle_tabwin_mode -s 1
 	xfconf-query -c xsettings -p /Net/ThemeName -s "Arc-Dark"
 	xfconf-query -c xsettings -p /Gtk/FontName -s "Noto Sans 9"
-	xfconf-query -c xsettings -p /Xfce/LastCustomDPI -s 101
+	xfconf-query -c xsettings -p /Xfce/LastCustomDPI -n -t string -s 101
 	xfconf-query -c xsettings -p /Xft/Antialias -s 1
 	xfconf-query -c xsettings -p /Xft/DPI -s 101
 	xfconf-query -c xsettings -p /Xft/Hinting -s 1
 	xfconf-query -c xsettings -p /Xft/HintStyle -s "hintmedium"
-	xfconf-query -c xsettings -p /Xft/RGBA -s "rgba"
+	xfconf-query -c xsettings -p /Xft/RGBA -s "rgb"
 	xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 24
 
 install-community-wallpapers: /usr/share/xfce4/backgrounds
