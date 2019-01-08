@@ -137,6 +137,14 @@ $(HOME)/.profile.orig:
 		touch $(HOME)/.profile.orig ; \
 	fi
 
+x220-add-fullscreen-to-vm: /etc/X11/xorg.conf.d/40-x220.conf
+
+/etc/X11/xorg.conf.d/40-x220.conf: 40-vm-on-x220.conf | /etc/X11/xorg.conf.d
+	sudo cp 40-vm-on-x220.conf $@
+
+/etc/X11/xorg.conf.d:
+	sudo mkdir -p $@
+
 desktop-look:
 	xfconf-query -c xfwm4 -p /general/theme -s "Arc-Dark"
 	xfconf-query -c xfwm4 -p /general/title_font -s "Noto Sans Bold 9"
