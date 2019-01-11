@@ -1,13 +1,18 @@
 from fabric import task
 
+
 @task
-def copy_files(c):
+def sync(c):
+    """Sync files to host that are required to provision it."""
     with c.cd('/home/vagrant/'):
         c.run('mkdir tmp', warn=True)
         c.put('Makefile', 'tmp')
         c.put('40-vm-on-x220.conf', 'tmp')
 
+
 @task
-def x220_add_fullscreen_to_vm(c):
+def make(c, targets):
+    """Execute the Makefile on the host with the given targets."""
+    targets = targets.replace(',', ' ')
     with c.cd('/home/vagrant/tmp'):
-        c.run('make x220-add-fullscreen-to-vm')
+        result = c.run('make {}'.format(targets))
