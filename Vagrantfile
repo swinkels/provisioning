@@ -59,11 +59,17 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provider "libvirt" do |libvirt|
+
     libvirt.storage_pool_name = "kvm-pool"
+
     libvirt.memory = 4096
+
     libvirt.graphics_type = "spice"
     libvirt.video_type = "qxl"
     libvirt.video_vram = 131072
+
+    libvirt.suspend_mode = "managedsave"
+
   end
   #
   # View the documentation for the provider you are using for more
