@@ -1,0 +1,114 @@
+(work in progress)
+
+This repo contains the files to provision a virtual machine that runs a Xubuntu
+desktop environment. The virtual machine uses KVM and as such, requires a Linux
+host.
+
+* Tools & technologies
+
+To provision the virtual machine (VM), I rely on the following tools:
+
+- [[https://www.linux-kvm.org/page/Main_Page][KVM]] to create and run VMs on Linux
+- [[https://libvirt.org/][libvirt]] to manage the VMs and to provide an API to [[https://www.vagrantup.com/][Vagrant]]
+- [[https://www.vagrantup.com/][Vagrant]] to install a VM based on Ubuntu 18.04
+- [[https://www.gnu.org/software/make/][GNU Make]] to automate the configuration of the VM after its install
+- [[http://www.fabfile.org/][Fabric]] to deploy the Makefile to the VM and run it there
+
+* Initial setup
+
+** Configuration of libvirt storage pool
+
+libvirt stores VM images in a storage pool named "default" and that points to
+/var/lib/libvirt/images. That is not ideal for my main host machine as the home
+partition is on a smaller SSD and I added a second storage pool named "kvm-pool"
+on my second, much larger drive[fn:kvm-pool]. I did this using [[https://virt-manager.org/][virt-manager]], a
+GUI application to manage virtual machines through libvirt.
+
+** Installation of Vagrant
+
+I use the vagrant version that comes with Xubuntu 16.04:
+#+BEGIN_SRC
+apt-get install vagrant
+#+END_SRC
+At the time of writing this, its version is version 2.2.2.
+
+To be able to use vagrant with KVM and libvirt, I need several vagrant plugins:
+#+BEGIN_SRC
+vagrant plugin install vagrant-kvm
+vagrant plugin install vagrant-libvirt
+vagrant plugin install nokogiri
+vagrant plugin install vagrant-mutate
+#+END_SRC
+
+Vagrant downloads end up in your home directory in ~/.vagrant.d/. To let Vagrant
+use a directory on my second drive, I set environment variable VAGRANT_HOME:
+#+BEGIN_SRC
+export VAGRANT_HOME=/media/data/pieter/.vagrant.d
+#+END_SRC
+I set that line in ~/.profile so it is always set.
+
+** Setup the Python environment
+
+Fabric is a Python tool to execute shell commands over SSH. I use the Python2
+version, which I install in a Python virtual environment. The use of virtualenvs
+is beyond the scope of this README, but to setup one and install Fabric, use the
+following commands:
+#+BEGIN_SRC
+mkvirtualenv provisioning
+pip install -r requirements.txt
+#+END_SRC
+
+** Preparation of the Vagrant box
+
+We download the [[https://app.vagrantup.com/bento/boxes/ubuntu-18.04][bento/ubuntu-18.04]] box for our VM:
+#+BEGIN_SRC
+vagrant box add bento/ubuntu-18.04 --provider virtualbox
+#+END_SRC
+Ideally we would have downloaded a box for libvirt but that one is not
+available. There we download the one for VirtualBox and convert that one to
+libvirt:
+#+BEGIN_SRC
+vagrant mutate bento/ubuntu-18.04 libvirt
+#+END_SRC
+
+* Provision the VM
+
+** Initial installation
+
+** Further configuration
+
+** Final manual configuration
+
+* Use plain SSH to connect to VM
+
+#+BEGIN_SRC
+$> vagrant ssh-config > vagrant-ssh
+$> cat vagrant-ssh
+Host default
+  HostName 192.168.121.87
+  User vagrant
+  Port 22
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentityFile /home/pieter/repos/github.com/provisioning/.vagrant/machines/default/libvirt/private_key
+  IdentitiesOnly yes
+  LogLevel FATAL
+#+END_SRC
+
+#+BEGIN_SRC
+$> ssh -F vagrant-ssh default
+#+END_SRC
+
+#+BEGIN_SRC
+$> workon provisioning
+$> fab --hosts=default --ssh-config=vagrant-ssh copy-files
+$> fab --hosts=default --ssh-config=vagrant-ssh make bootstrap x220-add-fullscreen-to-vm
+#+END_SRC
+
+[fn:kvm-pool] In hindsight, it would have been easier to just delete the default
+storage pool and recreate it on the second drive.
+
+"the virtualization module in the Linux kernel that allows the kernel to
+create and run virtual machines"[fn:kvm]
+[fn:kvm] Wikipedia articles [[https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine][Kernel-based Virtual Machine]] and [[https://en.wikipedia.org/wiki/Hypervisor][Hypervisor]]. URLs visited on January 24, 2019.
