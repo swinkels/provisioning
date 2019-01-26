@@ -1,7 +1,21 @@
 LOCAL_FONTS_DIR=$(HOME)/.local/share/fonts
 LOCAL_GITHUB_REPOS_DIR=$(HOME)/repos/github.com
 
-all: spacemacs-config
+bootstrap:
+	# set the local time to CET
+	sudo rm /etc/localtime && ln -s /usr/share/zoneinfo/CET /etc/localtime
+	# resynchronize the package index files from their sources
+	sudo apt-get update
+	# install the newest versions of all packages currently installed
+	sudo apt-get upgrade
+	# install a display manager
+	sudo apt-get install -y lightdm lightdm-gtk-greeter
+	# install xfce
+	sudo apt-get install -y xfce4 xfce4-terminal
+	# permit anyone to start the GUI
+	sudo sed -i 's/allowed_users=.*$/allowed_users=anybody/' /etc/X11/Xwrapper.config
+	# install "absolutely required" applications
+	sudo apt-get install -y firefox git zsh
 
 .PHONY: depends install-emacs-dependencies append-local-to-path
 
