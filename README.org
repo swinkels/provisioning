@@ -1,18 +1,28 @@
 (work in progress)
 
-This repo contains the files to provision a virtual machine that runs a Xubuntu
-desktop environment. The virtual machine uses KVM and as such, requires a Linux
-host.
+This repo contains the files to provision a virtual machine that runs the
+Xubuntu desktop environment that I use as the starting point for my development
+machines. The virtual machine uses KVM and as such, requires a Linux host.
 
 * Tools & technologies
 
-To provision the virtual machine (VM), I rely on the following tools:
+To create and configure the virtual machine (VM), I rely on the following tools:
 
 - [[https://www.linux-kvm.org/page/Main_Page][KVM]] to create and run VMs on Linux
 - [[https://libvirt.org/][libvirt]] to manage the VMs and to provide an API to [[https://www.vagrantup.com/][Vagrant]]
 - [[https://www.vagrantup.com/][Vagrant]] to install a VM based on Ubuntu 18.04
 - [[https://www.gnu.org/software/make/][GNU Make]] to automate the configuration of the VM after its install
 - [[http://www.fabfile.org/][Fabric]] to deploy the Makefile to the VM and run it there
+
+In the context of Vagrant, /provisioning/ is the term to "automatically install
+software, alter configurations, and more on the machine as part of the vagrant
+up process"[fn:vagrant-provision]]. As such, Vagrant reserves "provisioning" to
+the configuration of the OS once Vagrant has created the VM and installed the
+base box.
+
+I am not sure if the Vagrent definition of provisioning is the official one, if
+there is an official one, but that is the definition I use in this document. So
+in my setup, GNU make and Fabric take care of provisioning the VM.
 
 * Initial setup
 
@@ -60,30 +70,43 @@ pip install -r requirements.txt
 
 ** Preparation of the Vagrant box
 
-We download the [[https://app.vagrantup.com/bento/boxes/ubuntu-18.04][bento/ubuntu-18.04]] box for our VM:
-#+BEGIN_SRC
+The [[https://app.vagrantup.com/bento/boxes/ubuntu-18.04][bento/ubuntu-18.04]] box is not available for libvirt, so I downloaded the
+onver for VirtualBox:
+#+BEGIN_SR
 vagrant box add bento/ubuntu-18.04 --provider virtualbox
 #+END_SRC
-Ideally we would have downloaded a box for libvirt but that one is not
-available. There we download the one for VirtualBox and convert that one to
-libvirt:
+and convert that one to libvirt:
 #+BEGIN_SRC
 vagrant mutate bento/ubuntu-18.04 libvirt
 #+END_SRC
 
-* Provision the VM
+* Creating and provision the VM
 
 ** Initial installation
 
-** Further configuration
-
-** Final manual configuration
-
-* Use plain SSH to connect to VM
-
+To create the VM and install the base box, use the following command:
 #+BEGIN_SRC
-$> vagrant ssh-config > vagrant-ssh
-$> cat vagrant-ssh
+vagrant up --provider=libvirt
+#+END_SRC
+When that command finishes, the VM is up and running and we can connect to
+it using the following command:
+#+BEGIN_SRC sh
+vagrant ssh
+#+END_SRC
+In its current state, the installed OS is rather bare-bones. To be able to use
+it for development a lot more configuration is needed. That configuration is
+done using Fabric.
+
+** Provisioning
+
+Fortunately Vagrant can export its SSH config so other tools can use it:
+#+BEGIN_SRC sh :results output
+vagrant ssh-config > vagrant-ssh
+cat vagrant-ssh
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
 Host default
   HostName 192.168.121.87
   User vagrant
@@ -94,21 +117,70 @@ Host default
   IdentityFile /home/pieter/repos/github.com/provisioning/.vagrant/machines/default/libvirt/private_key
   IdentitiesOnly yes
   LogLevel FATAL
-#+END_SRC
 
+#+end_example
+
+For example, we can use standard ssh to connect to the VM:
 #+BEGIN_SRC
 $> ssh -F vagrant-ssh default
 #+END_SRC
 
+Much of the configuration of the VM is automated via the Makefile that is in the
+root of this rep. I use Fabric to copy the Makefile to the VM, and run ~make
+bootstrap~ on the VM. You can execute these two steps as follows:
 #+BEGIN_SRC
 $> workon provisioning
 $> fab --hosts=default --ssh-config=vagrant-ssh copy-files
 $> fab --hosts=default --ssh-config=vagrant-ssh make bootstrap x220-add-fullscreen-to-vm
 #+END_SRC
 
+** Final manual configuration
+
+* Appendix
+
+** Often used Vagrant commands
+
+- vagrant up :: to install or restart the VM
+- vagrant suspend :: to "suspend" the VM - note that what suspend does, depends
+     on the provider
+- vagrant reload :: to shutdown a running VM and restart it
+- vagrant provision :: to configure the VM
+
+In the remainder of this section I will illustrate the use of these commands.
+
+First up is vagrant up. Vagrant installs or starts the VM with the default
+provider, which is VirtualBox by default. Om my main development machine I use
+libvirt so I have to pass that to the vagrant up command[fn:default-provider]:
+#+BEGIN_SRC sh :results output
+vagrant up --provider=libvirt
+#+END_SRC
+
+#+RESULTS:
+: Bringing machine 'default' up with 'libvirt' provider...
+: ==> default: Checking if box 'bento/ubuntu-18.04' is up to date...
+: ==> default: Resuming domain...
+
+The suspend command suspends the VM. As mentioned, suspend means different
+things for different providers. For VirtualBox it means suspend-to-disk and for
+libvirt it means suspend-to-memory. I changed the behavior for libvirt to
+suspend-to-disk in the Vagrantfile:
+#+BEGIN_SRC sh :results output
+vagrant suspend
+#+END_SRC
+
+#+RESULTS:
+: ==> default: Suspending domain...
+
+** Troubeshooting
+
+* Footnotes
+
+[fn:vagran-provisioning] [[https://www.vagrantup.com/docs/provisioning/][Provisioning]]. URL visited on January 26, 2019.
 [fn:kvm-pool] In hindsight, it would have been easier to just delete the default
 storage pool and recreate it on the second drive.
+[fn:default-provider] You can also change the default provider by setting
+environment variable ~VAGRANT_DEFAULT_PROVIDER~ to the desired default.
 
-"the virtualization module in the Linux kernel that allows the kernel to
-create and run virtual machines"[fn:kvm]
+ "the virtualization module in the Linux kernel that allows the kernel to create
+and run virtual machines"[fn:kvm]
 [fn:kvm] Wikipedia articles [[https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine][Kernel-based Virtual Machine]] and [[https://en.wikipedia.org/wiki/Hypervisor][Hypervisor]]. URLs visited on January 24, 2019.
