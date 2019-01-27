@@ -158,13 +158,19 @@ vagrant up --provider=libvirt
 #+RESULTS:
 : Bringing machine 'default' up with 'libvirt' provider...
 : ==> default: Checking if box 'bento/ubuntu-18.04' is up to date...
-: ==> default: Resuming domain...
+: ==> default: Starting domain.
+: ==> default: Waiting for domain to get an IP address...
+: ==> default: Waiting for SSH to become available...
+: ==> default: Creating shared folders metadata...
+: ==> default: Rsyncing folder: /home/pieter/repos/github.com/provisioning/ => /vagrant
+: ==> default: Machine already provisioned. Run `vagrant provision` or use the `--provision`
+: ==> default: flag to force provisioning. Provisioners marked to run always will still run.
 
 The suspend command suspends the VM. As mentioned, suspend means different
 things for different providers. For VirtualBox it means suspend-to-disk and for
 libvirt it means suspend-to-memory. I changed the behavior for libvirt to
 suspend-to-disk in the Vagrantfile:
-#+BEGIN_SRC sh :results output
+#+BEGIN_SRC sh
 vagrant suspend
 #+END_SRC
 
