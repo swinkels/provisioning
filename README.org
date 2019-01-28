@@ -100,39 +100,48 @@ done using Fabric.
 ** Provisioning
 
 Fortunately Vagrant can export its SSH config so other tools can use it:
-#+BEGIN_SRC sh :results output
+#+BEGIN_SRC sh :results output :exports both
 vagrant ssh-config > vagrant-ssh
 cat vagrant-ssh
 #+END_SRC
 
 #+RESULTS:
-#+begin_example
-Host default
-  HostName 192.168.121.87
-  User vagrant
-  Port 22
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-  IdentityFile /home/pieter/repos/github.com/provisioning/.vagrant/machines/default/libvirt/private_key
-  IdentitiesOnly yes
-  LogLevel FATAL
-
-#+end_example
+: Host default
+:   HostName 192.168.121.63
+:   User vagrant
+:   Port 22
+:   UserKnownHostsFile /dev/null
+:   StrictHostKeyChecking no
+:   PasswordAuthentication no
+:   IdentityFile /home/pieter/tmp/provisioning/demo/.vagrant/machines/default/libvirt/private_key
+:   IdentitiesOnly yes
+:   LogLevel FATAL
+:
 
 For example, we can use standard ssh to connect to the VM:
 #+BEGIN_SRC
 $> ssh -F vagrant-ssh default
 #+END_SRC
 
+#+BEGIN_SRC elisp :results silent :exports none
+(pyvenv-workon "provisioning")
+#+END_SRC
+
 Much of the configuration of the VM is automated via the Makefile that is in the
 root of this rep. I use Fabric to copy the Makefile to the VM, and run ~make
-bootstrap~ on the VM. You can execute these two steps as follows:
-#+BEGIN_SRC
-$> workon provisioning
-$> fab --hosts=default --ssh-config=vagrant-ssh copy-files
-$> fab --hosts=default --ssh-config=vagrant-ssh make bootstrap x220-add-fullscreen-to-vm
+bootstrap~ on the VM. First copy the Makefile and supporting file(s):
+#+BEGIN_SRC sh :results output :exports both
+fab --hosts=default --ssh-config=vagrant-ssh sync
 #+END_SRC
+
+#+RESULTS:
+
+Then run the Makefile for the given targets:
+#+BEGIN_SRC sh :results output :exports both
+fab --hosts=default --ssh-config=vagrant-ssh make bootstrap,x220-add-fullscreen-to-vm
+#+END_SRC
+
+#+RESULTS:
 
 ** Final manual configuration
 
@@ -140,7 +149,7 @@ $> fab --hosts=default --ssh-config=vagrant-ssh make bootstrap x220-add-fullscre
 
 ** Often used Vagrant commands
 
-- vagrant up :: to install or restart the VM
+- vagrant up :: to install or start the VM
 - vagrant suspend :: to "suspend" the VM - note that what suspend does, depends
      on the provider
 - vagrant reload :: to shutdown a running VM and restart it
@@ -148,23 +157,63 @@ $> fab --hosts=default --ssh-config=vagrant-ssh make bootstrap x220-add-fullscre
 
 In the remainder of this section I will illustrate the use of these commands.
 
-First up is vagrant up. Vagrant installs or starts the VM with the default
-provider, which is VirtualBox by default. Om my main development machine I use
-libvirt so I have to pass that to the vagrant up command[fn:default-provider]:
-#+BEGIN_SRC sh :results output
+First up is vagrant up. Vagrant installs the VM, or starts it when it already
+exists, for the default provider, which is VirtualBox. On my main development
+machine I use libvirt so I have to pass the provider name to the vagrant up
+command[fn:default-provider]. The output of the next command shows the
+installation of a new VM:
+#+BEGIN_SRC sh :results output :exports both
 vagrant up --provider=libvirt
 #+END_SRC
 
 #+RESULTS:
 : Bringing machine 'default' up with 'libvirt' provider...
 : ==> default: Checking if box 'bento/ubuntu-18.04' is up to date...
+: ==> default: Creating image (snapshot of base box volume).
+: ==> default: Creating domain with the following settings...
+: ==> default:  -- Name:              demo_default
+: ==> default:  -- Domain type:       kvm
+: ==> default:  -- Cpus:              1
+: ==> default:  -- Feature:           acpi
+: ==> default:  -- Feature:           apic
+: ==> default:  -- Feature:           pae
+: ==> default:  -- Memory:            4096M
+: ==> default:  -- Management MAC:
+: ==> default:  -- Loader:
+: ==> default:  -- Nvram:
+: ==> default:  -- Base box:          bento/ubuntu-18.04
+: ==> default:  -- Storage pool:      kvm-pool
+: ==> default:  -- Image:             /home/pieter/extra-storage-encrypted/kvm-pool/demo_default.img (64G)
+: ==> default:  -- Volume Cache:      default
+: ==> default:  -- Kernel:
+: ==> default:  -- Initrd:
+: ==> default:  -- Graphics Type:     spice
+: ==> default:  -- Graphics Port:     -1
+: ==> default:  -- Graphics IP:       127.0.0.1
+: ==> default:  -- Graphics Password: Not defined
+: ==> default:  -- Video Type:        qxl
+: ==> default:  -- Video VRAM:        131072
+: ==> default:  -- Sound Type:
+: ==> default:  -- Keymap:            en-us
+: ==> default:  -- TPM Path:
+: ==> default:  -- INPUT:             type=mouse, bus=ps2
+: ==> default: Creating shared folders metadata...
 : ==> default: Starting domain.
 : ==> default: Waiting for domain to get an IP address...
 : ==> default: Waiting for SSH to become available...
-: ==> default: Creating shared folders metadata...
-: ==> default: Rsyncing folder: /home/pieter/repos/github.com/provisioning/ => /vagrant
-: ==> default: Machine already provisioned. Run `vagrant provision` or use the `--provision`
-: ==> default: flag to force provisioning. Provisioners marked to run always will still run.
+:     default:
+:     default: Vagrant insecure key detected. Vagrant will automatically replace
+:     default: this with a newly generated keypair for better security.
+:     default:
+:     default: Inserting generated public key within guest...
+:     default: Removing insecure key from the guest if it's present...
+:     default: Key inserted! Disconnecting and reconnecting using new SSH key...
+: ==> default: Configuring and enabling network interfaces...
+: ==> default: Rsyncing folder: /home/pieter/tmp/provisioning/demo/ => /vagrant
+: ==> default: Running provisioner: shell...
+:     default: Running: inline script
+: ==> default: Running provisioner: file...
+: ==> default: Running provisioner: file...
 
 The suspend command suspends the VM. As mentioned, suspend means different
 things for different providers. For VirtualBox it means suspend-to-disk and for
