@@ -71,7 +71,7 @@ Vagrant.configure(2) do |config|
     libvirt.suspend_mode = "managedsave"
 
   end
-  #
+
   # View the documentation for the provider you are using for more
   # information on available options.
 
@@ -79,17 +79,7 @@ Vagrant.configure(2) do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
-    sudo apt-get update
-    # Set the local time to CET
-    sudo rm /etc/localtime && ln -s /usr/share/zoneinfo/CET /etc/localtime
-    # Install a display manager (for some reason or another, TeamViewer requires one)
-    sudo apt-get install -y lightdm lightdm-gtk-greeter
-    # Install xfce
-    sudo apt-get install -y xfce4 xfce4-whiskermenu-plugin xfce4-terminal
-    # Permit anyone to start the GUI
-    sudo sed -i 's/allowed_users=.*$/allowed_users=anybody/' /etc/X11/Xwrapper.config
-    # install misc applications
-    sudo apt-get install -y firefox git zsh
+    # add shell commands to execute in the new guest
   SHELL
 
   config.vm.provision "file", source: "~/.ssh/throwaway", destination: "/home/vagrant/.ssh/id_rsa"
