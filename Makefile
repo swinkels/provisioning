@@ -3,17 +3,18 @@ LOCAL_GITHUB_REPOS_DIR=$(HOME)/repos/github.com
 
 bootstrap:
 	# set the local time to CET
-	sudo rm /etc/localtime && ln -s /usr/share/zoneinfo/CET /etc/localtime
+	- sudo rm /etc/localtime
+	sudo ln -s /usr/share/zoneinfo/CET /etc/localtime
 	# resynchronize the package index files from their sources
-	sudo apt-get update
+	sudo apt-get update -y
 	# install the newest versions of all packages currently installed
-	sudo apt-get upgrade
+	sudo apt-get upgrade -y
 	# install a display manager
 	sudo apt-get install -y lightdm lightdm-gtk-greeter
 	# install xfce
 	sudo apt-get install -y xfce4 xfce4-terminal
 	# permit anyone to start the GUI
-	sudo sed -i 's/allowed_users=.*$/allowed_users=anybody/' /etc/X11/Xwrapper.config
+	sudo sed -i 's/allowed_users=.*/allowed_users=anybody/' /etc/X11/Xwrapper.config
 	# install "absolutely required" applications
 	sudo apt-get install -y firefox git zsh
 
