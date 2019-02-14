@@ -8,7 +8,7 @@ bootstrap:
 	# resynchronize the package index files from their sources
 	sudo apt-get update -y
 	# install the newest versions of all packages currently installed
-	sudo apt-get upgrade -y
+	sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -o DPkg::Options::=--force-confdef -y
 	# install a display manager
 	sudo apt-get install -y lightdm lightdm-gtk-greeter
 	# install xfce
