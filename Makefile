@@ -18,7 +18,7 @@ bootstrap:
 	# install "absolutely required" applications
 	sudo apt-get install -y firefox git zsh
 
-.PHONY: depends install-emacs-dependencies append-local-to-path
+.PHONY: depends install-emacs-dependencies append-local-to-path whiskermenu
 
 depends: install-emacs-dependencies
 
@@ -169,16 +169,17 @@ desktop-look:
 	xfconf-query -c xsettings -p /Gtk/FontName -s "Noto Sans 9"
 	xfconf-query -c xsettings -p /Xfce/LastCustomDPI -n -t string -s 101
 	xfconf-query -c xsettings -p /Xft/Antialias -s 1
-	xfconf-query -c xsettings -p /Xft/DPI -s 101
+	xfconf-query -c xsettings -p /Xft/DPI -n -t int -s 101
 	xfconf-query -c xsettings -p /Xft/Hinting -s 1
 	xfconf-query -c xsettings -p /Xft/HintStyle -s "hintmedium"
 	xfconf-query -c xsettings -p /Xft/RGBA -s "rgb"
 	xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 24
 
-install-community-wallpapers: /usr/share/xfce4/backgrounds
-
-/usr/share/xfce4/backgrounds:
+install-community-wallpapers:
 	sudo apt-get install xubuntu-community-wallpapers
+
+whiskermenu:
+	sudo apt-get install xfce4-whiskermenu-plugin
 
 BROWSER_MARKER=WebBrowser=
 BROWSER=firefox
