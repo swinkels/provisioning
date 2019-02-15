@@ -16,6 +16,7 @@ bootstrap:
 	# permit anyone to start the GUI
 	sudo sed -i 's/allowed_users=.*/allowed_users=anybody/' /etc/X11/Xwrapper.config
 	# install "absolutely required" applications
+	sudo apt-get install -y policykit-1-gnome synaptic
 	sudo apt-get install -y firefox git zsh
 
 .PHONY: depends install-emacs-dependencies append-local-to-path whiskermenu
