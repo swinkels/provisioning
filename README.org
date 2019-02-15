@@ -136,14 +136,37 @@ fab --hosts=default --ssh-config=vagrant-ssh sync
 
 #+RESULTS:
 
-Then run the Makefile for the given targets:
+Then run the Makefile for target 'bootstrap', which will update the installed
+packages and install some (more or less) essential packages:
 #+BEGIN_SRC sh :results output :exports both
-fab --hosts=default --ssh-config=vagrant-ssh make bootstrap,x220-add-fullscreen-to-vm
+fab --hosts=default --ssh-config=vagrant-ssh make bootstrap
+#+END_SRC
+After this target and the update of installed packages, you are advised to
+reboot the host:
+#+BEGIN_SRC sh :results output :exports both
+vagrant reload
 #+END_SRC
 
 #+RESULTS:
+: ==> default: Halting domain...
+: ==> default: Starting domain.
+: ==> default: Waiting for domain to get an IP address...
+: ==> default: Waiting for SSH to become available...
+: ==> default: Creating shared folders metadata...
+: ==> default: Rsyncing folder: /home/pieter/tmp/provisioning/demo/ => /vagrant
+: ==> default: Machine already provisioned. Run `vagrant provision` or use the `--provision`
+: ==> default: flag to force provisioning. Provisioners marked to run always will still run.
+
+The Makefile has several other targets to provision the VM, see section [[*Makefile rules][Makefile
+rules]] for an overview.
 
 ** Final manual configuration
+
+There are some customizations to my desktop environment that I did not bother to
+automate, for example, I
+- use the Whisker Menu instead of the Application Menu,
+- remove the second panel at the bottom of the Xfce desktop, and
+- set a desktop wallpaper.
 
 * Appendix
 
@@ -225,6 +248,18 @@ vagrant suspend
 
 #+RESULTS:
 : ==> default: Suspending domain...
+
+** Makefile rules
+
+- x220-add-fullscreen-to-vm :: configure Xorg to enable a fullscreen resolution
+     on a Thinkpad X220
+- append-local-to-path :: add ~/.local/bin to the PATH of user vagrant
+- set-caps-to-ctrl :: let the CAPS key behave like the CTRL of user vagrant
+- desktop-look :: theme the desktop
+- install-community-wallpapers :: install the wallpapers from the Xubuntu 18.04
+     community contest
+- whiskermenu :: install the Whisker Menu, a panel item that can replace the
+     application menu
 
 ** Troubeshooting
 
