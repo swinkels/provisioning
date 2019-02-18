@@ -130,7 +130,7 @@ $(HOME)/.xprofile.orig:
 
 LOCAL_BIN=\$$HOME/.local/bin
 LOCAL_DIR_MARKER="PATH=\"$(LOCAL_BIN)"
-LOCAL_DIR_LINES=if [ -d \"$(LOCAL_BIN)\" ]; then PATH=\"$(LOCAL_BIN):\$$PATH\"; fi
+LOCAL_DIR_LINES=if [ -d \"$(LOCAL_BIN)\" ]; then export PATH=\"$(LOCAL_BIN):\$$PATH\"; fi
 
 append-local-to-path: $(HOME)/.profile
 	if ! grep -q $(LOCAL_DIR_MARKER) $<; then \
