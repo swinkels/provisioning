@@ -27,15 +27,14 @@ fix-sources-list:
 	sudo sed -i -r 's/^# (deb-src http.* bionic main restricted.*)/\1/' /etc/apt/sources.list
 	sudo apt-get update
 
-install-emacs-dependencies:
-	sudo apt-get install build-essential
-	sudo apt-get build-dep emacs25
-
 EMACS_VERSION=26.1
 EMACS_NAME=emacs-$(EMACS_VERSION)
 EMACS_ARCHIVE=$(EMACS_NAME).tar.gz
 
-emacs: $(HOME)/.local/bin/$(EMACS_NAME)
+emacs: install-emacs-build-dependencies $(HOME)/.local/bin/$(EMACS_NAME)
+
+install-emacs-build-dependencies:
+	sudo apt-get -y install autoconf automake libtool texinfo build-essential xorg-dev libgtk2.0-dev libjpeg-dev libncurses5-dev libdbus-1-dev libgif-dev libtiff-dev libm17n-dev libpng-dev librsvg2-dev libotf-dev libgnutls28-dev libxml2-dev
 
 $(HOME)/.local/bin/$(EMACS_NAME): $(HOME)/external_software/$(EMACS_NAME) | $(HOME)/.local
 	cd $< && ./configure --prefix=$(HOME)/.local && make && make install
