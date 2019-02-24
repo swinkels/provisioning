@@ -49,7 +49,10 @@ emacs-clean:
 	- cd $(HOME)/external_software/$(EMACS_NAME) && make uninstall
 	- rm -rf $(HOME)/external_software/$(EMACS_NAME)
 
-spacemacs: $(HOME)/.emacs.d
+spacemacs: install-spacemacs-dependencies $(HOME)/.emacs.d
+
+install-spacemacs-dependencies:
+	apt-get install -y fonts-powerline
 
 $(HOME)/.emacs.d: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs
 	ln -s $< $@
