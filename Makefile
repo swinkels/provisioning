@@ -82,15 +82,29 @@ $(LOCAL_GITHUB_REPOS_DIR)/source-code-pro: | $(LOCAL_GITHUB_REPOS_DIR)
 
 python-dev: | $(HOME)/.local $(HOME)/tmp
 	curl -fsSL https://bootstrap.pypa.io/get-pip.py > $(HOME)/tmp/get-pip.py
-	python $(HOME)/tmp/get-pip.py --user
 	python3 $(HOME)/tmp/get-pip.py --user
-	pip install --user --upgrade virtualenvwrapper
+	$(HOME)/.local/bin/pip install --user --upgrade virtualenvwrapper
 
-WRAPPER_MARKER=virtualenvwrapper,
+SOURCE_WRAPPER_MARKER=\$$HOME/.local/bin/virtualenvwrapper.sh
+SOURCE_WRAPPER_LINES=source $(SOURCE_WRAPPER_MARKER)
+
+install-virtualenvwrapper-in-zsh: $(HOME)/.zshrc $(HOME)/.virtualenvs
+	if ! grep -q "$(SOURCE_WRAPPER_MARKER)" $<; then \
+		echo >> $< ; \
+		echo "# added by the provisioning script" >> $< ; \
+		echo "export WORKON_HOME=\$$HOME/.virtualenvs" >> $< ; \
+		echo "export VIRTUALENVWRAPPER_PYTHON=`which python3`" >> $< ; \
+		echo "$(SOURCE_WRAPPER_LINES)" >> $< ; \
+	fi
+
+$(HOME)/.virtualenvs:
+	mkdir $@
+
+WRAPPER_MARKER=virtualenvwrapper
 
 install-zsh-plugin-virtualenvwrapper: $(HOME)/.zshrc
 	if ! grep -q "$(WRAPPER_MARKER)" $<; then \
-		sed -i -r 's/(^plugins=\($$)/\1\n  $(WRAPPER_MARKER)/' $(HOME)/.zshrc ; \
+		sed -i -r 's/(^plugins=\()(.*)$$/\1$(WRAPPER_MARKER) \2/' $(HOME)/.zshrc ; \
 	fi
 
 $(HOME)/.zshrc: $(HOME)/.zshrc.orig
