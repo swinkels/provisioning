@@ -261,6 +261,70 @@ vagrant suspend
 - whiskermenu :: install the Whisker Menu, a panel item that can replace the
      application menu
 
+*** Emacs
+
+Target *emacs* builds Emacs from source and installs it locally:
+#+BEGIN_SRC makefile :noweb-ref emacs-from-source
+EMACS_VERSION=26.1
+EMACS_NAME=emacs-$(EMACS_VERSION)
+EMACS_ARCHIVE=$(EMACS_NAME).tar.gz
+
+emacs: install-emacs-build-dependencies $(HOME)/.local/bin/$(EMACS_NAME)
+
+install-emacs-build-dependencies:
+	sudo apt-get -y install autoconf automake libtool texinfo build-essential xorg-dev libgtk2.0-dev libjpeg-dev libncurses5-dev libdbus-1-dev libgif-dev libtiff-dev libm17n-dev libpng-dev librsvg2-dev libotf-dev libgnutls28-dev libxml2-dev
+
+$(HOME)/.local/bin/$(EMACS_NAME): $(HOME)/external_software/$(EMACS_NAME) | $(HOME)/.local
+	cd $< && ./configure --prefix=$(HOME)/.local && make && make install
+
+$(HOME)/external_software/$(EMACS_NAME): $(HOME)/tmp/$(EMACS_ARCHIVE) | $(HOME)/external_software
+	tar xvf $< -C $(HOME)/external_software
+
+$(HOME)/tmp/$(EMACS_ARCHIVE): | $(HOME)/tmp
+	cd $(HOME)/tmp && wget --timestamping http://ftp.snt.utwente.nl/pub/software/gnu/emacs/$(EMACS_ARCHIVE)
+
+emacs-clean:
+	- cd $(HOME)/external_software/$(EMACS_NAME) && make uninstall
+	- rm -rf $(HOME)/external_software/$(EMACS_NAME)
+#+END_SRC
+
+*** Spacemacs
+
+Target *spacemacs* does two things, it installs Spacemacs and my personal
+Spacemacs configuration:
+#+BEGIN_SRC makefile :noweb-ref spacemacs
+spacemacs: install-spacemacs-dependencies $(HOME)/.emacs.d
+
+install-spacemacs-dependencies:
+	apt-get install -y fonts-powerline
+
+$(HOME)/.emacs.d: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs
+	ln -s $< $@
+
+$(LOCAL_GITHUB_REPOS_DIR)/spacemacs: | $(LOCAL_GITHUB_REPOS_DIR)
+	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/syl20bnr/spacemacs.git
+
+spacemacs-config: $(HOME)/.spacemacs $(LOCAL_GITHUB_REPOS_DIR)/oje
+
+$(HOME)/.spacemacs: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config/.spacemacs
+	ln -s $< $@
+
+$(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config/.spacemacs: | $(LOCAL_GITHUB_REPOS_DIR)
+	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/swinkels/spacemacs-config.git
+
+$(LOCAL_GITHUB_REPOS_DIR)/oje: | $(LOCAL_GITHUB_REPOS_DIR)
+	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/swinkels/oje.git
+
+fonts: $(LOCAL_FONTS_DIR)/source-code-pro
+
+$(LOCAL_FONTS_DIR)/source-code-pro: $(LOCAL_GITHUB_REPOS_DIR)/source-code-pro | $(LOCAL_FONTS_DIR)
+	ln -s $< $@
+	fc-cache -f -v $@
+
+$(LOCAL_GITHUB_REPOS_DIR)/source-code-pro: | $(LOCAL_GITHUB_REPOS_DIR)
+	cd $< && git clone --branch release --depth 1 https://github.com/adobe-fonts/source-code-pro.git
+#+END_SRC
+
 *** Python development
 
 Target *python-dev* installs the Python3 version of pip and virtualenvwrapper
@@ -331,58 +395,9 @@ fix-sources-list:
 	sudo sed -i -r 's/^# (deb-src http.* bionic main restricted.*)/\1/' /etc/apt/sources.list
 	sudo apt-get update
 
-EMACS_VERSION=26.1
-EMACS_NAME=emacs-$(EMACS_VERSION)
-EMACS_ARCHIVE=$(EMACS_NAME).tar.gz
+<<emacs-from-source>>
 
-emacs: install-emacs-build-dependencies $(HOME)/.local/bin/$(EMACS_NAME)
-
-install-emacs-build-dependencies:
-	sudo apt-get -y install autoconf automake libtool texinfo build-essential xorg-dev libgtk2.0-dev libjpeg-dev libncurses5-dev libdbus-1-dev libgif-dev libtiff-dev libm17n-dev libpng-dev librsvg2-dev libotf-dev libgnutls28-dev libxml2-dev
-
-$(HOME)/.local/bin/$(EMACS_NAME): $(HOME)/external_software/$(EMACS_NAME) | $(HOME)/.local
-	cd $< && ./configure --prefix=$(HOME)/.local && make && make install
-
-$(HOME)/external_software/$(EMACS_NAME): $(HOME)/tmp/$(EMACS_ARCHIVE) | $(HOME)/external_software
-	tar xvf $< -C $(HOME)/external_software
-
-$(HOME)/tmp/$(EMACS_ARCHIVE): | $(HOME)/tmp
-	cd $(HOME)/tmp && wget --timestamping http://ftp.snt.utwente.nl/pub/software/gnu/emacs/$(EMACS_ARCHIVE)
-
-emacs-clean:
-	- cd $(HOME)/external_software/$(EMACS_NAME) && make uninstall
-	- rm -rf $(HOME)/external_software/$(EMACS_NAME)
-
-spacemacs: install-spacemacs-dependencies $(HOME)/.emacs.d
-
-install-spacemacs-dependencies:
-	apt-get install -y fonts-powerline
-
-$(HOME)/.emacs.d: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs
-	ln -s $< $@
-
-$(LOCAL_GITHUB_REPOS_DIR)/spacemacs: | $(LOCAL_GITHUB_REPOS_DIR)
-	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/syl20bnr/spacemacs.git
-
-spacemacs-config: $(HOME)/.spacemacs $(LOCAL_GITHUB_REPOS_DIR)/oje
-
-$(HOME)/.spacemacs: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config/.spacemacs
-	ln -s $< $@
-
-$(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config/.spacemacs: | $(LOCAL_GITHUB_REPOS_DIR)
-	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/swinkels/spacemacs-config.git
-
-$(LOCAL_GITHUB_REPOS_DIR)/oje: | $(LOCAL_GITHUB_REPOS_DIR)
-	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/swinkels/oje.git
-
-fonts: $(LOCAL_FONTS_DIR)/source-code-pro
-
-$(LOCAL_FONTS_DIR)/source-code-pro: $(LOCAL_GITHUB_REPOS_DIR)/source-code-pro | $(LOCAL_FONTS_DIR)
-	ln -s $< $@
-	fc-cache -f -v $@
-
-$(LOCAL_GITHUB_REPOS_DIR)/source-code-pro: | $(LOCAL_GITHUB_REPOS_DIR)
-	cd $< && git clone --branch release --depth 1 https://github.com/adobe-fonts/source-code-pro.git
+<<spacemacs>>
 
 <<python-dev>>
 
