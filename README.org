@@ -251,15 +251,53 @@ vagrant suspend
 
 ** Makefile targets
 
-- x220-add-fullscreen-to-vm :: configure Xorg to enable a fullscreen resolution
-     on a Thinkpad X220
-- append-local-to-path :: add ~/.local/bin to the PATH of user vagrant
-- set-caps-to-ctrl :: let the CAPS key behave like the CTRL of user vagrant
+- zsh-config :: Use ZSH and Oh my zsh
 - desktop-look :: theme the desktop
 - install-community-wallpapers :: install the wallpapers from the Xubuntu 18.04
      community contest
+This installs the wallpapers in /usr/share/xfce4/backdrops
+
 - whiskermenu :: install the Whisker Menu, a panel item that can replace the
      application menu
+
+*** Add fullscreen resolution to Thinkpad X220
+
+The VM does not support the native resolution of my Thinkpad X220, that is,
+1366x768. Target *x220-add-fullscreen-to-vm* installs the appropriate Xorg
+configuration file:
+#+BEGIN_SRC makefile :noweb-ref x220-add-fullscreen-to-vm
+x220-add-fullscreen-to-vm: /etc/X11/xorg.conf.d/40-x220.conf
+
+/etc/X11/xorg.conf.d/40-x220.conf: 40-vm-on-x220.conf | /etc/X11/xorg.conf.d
+	sudo cp 40-vm-on-x220.conf $@
+
+/etc/X11/xorg.conf.d:
+	sudo mkdir -p $@
+#+END_SRC
+
+*** Let CAPS behave like CTRL
+As an Emacs user, I remap my CAPS key to CTRL. Target *set-caps-to-ctrl* adds
+takes care of that:
+#+BEGIN_SRC makefile :noweb-ref set-caps-to-ctrl
+CAPS_TO_CTRL_COMMAND="setxkbmap -option compose:rctrl -option ctrl:nocaps"
+
+set-caps-to-ctrl: $(HOME)/.xprofile
+	if ! grep -q $(CAPS_TO_CTRL_COMMAND) $<; then echo $(CAPS_TO_CTRL_COMMAND) >> $<; fi
+#+END_SRC
+
+*** Append local user directory to PATH
+When I install software for the current user only, I install it in ~/.local.
+Target *append-local-to-path* adds ~/.local/bin to the PATH of the current user:
+#+BEGIN_SRC makefile :noweb-ref append-local-to-path
+LOCAL_BIN=\$$HOME/.local/bin
+LOCAL_DIR_MARKER="PATH=\"$(LOCAL_BIN)"
+LOCAL_DIR_LINES=if [ -d \"$(LOCAL_BIN)\" ]; then export PATH=\"$(LOCAL_BIN):\$$PATH\"; fi
+
+append-local-to-path: $(HOME)/.profile
+	if ! grep -q $(LOCAL_DIR_MARKER) $<; then \
+		echo "$(LOCAL_DIR_LINES)" >> $< ; \
+	fi
+#+END_SRC
 
 *** Emacs
 
@@ -423,10 +461,7 @@ $(HOME)/tmp/install-oh-my-zsh.sh: | $(HOME)/tmp
 	curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh > $(HOME)/tmp/install-oh-my-zsh.sh
 	sed -i '/^.*env zsh -l/d' $(HOME)/tmp/install-oh-my-zsh.sh
 
-CAPS_TO_CTRL_COMMAND="setxkbmap -option compose:rctrl -option ctrl:nocaps"
-
-set-caps-to-ctrl: $(HOME)/.xprofile
-	if ! grep -q $(CAPS_TO_CTRL_COMMAND) $<; then echo $(CAPS_TO_CTRL_COMMAND) >> $<; fi
+<<set-caps-to-ctrl>>
 
 $(HOME)/.xprofile: $(HOME)/.xprofile.orig
 	cp $< $@
@@ -438,14 +473,7 @@ $(HOME)/.xprofile.orig:
 		touch $(HOME)/.xprofile.orig ; \
 	fi
 
-LOCAL_BIN=\$$HOME/.local/bin
-LOCAL_DIR_MARKER="PATH=\"$(LOCAL_BIN)"
-LOCAL_DIR_LINES=if [ -d \"$(LOCAL_BIN)\" ]; then export PATH=\"$(LOCAL_BIN):\$$PATH\"; fi
-
-append-local-to-path: $(HOME)/.profile
-	if ! grep -q $(LOCAL_DIR_MARKER) $<; then \
-		echo "$(LOCAL_DIR_LINES)" >> $< ; \
-	fi
+<<append-local-to-path>>
 
 $(HOME)/.profile: $(HOME)/.profile.orig
 	echo "# This file is generated from $< by the" > $@
@@ -462,13 +490,7 @@ $(HOME)/.profile.orig:
 		touch $(HOME)/.profile.orig ; \
 	fi
 
-x220-add-fullscreen-to-vm: /etc/X11/xorg.conf.d/40-x220.conf
-
-/etc/X11/xorg.conf.d/40-x220.conf: 40-vm-on-x220.conf | /etc/X11/xorg.conf.d
-	sudo cp 40-vm-on-x220.conf $@
-
-/etc/X11/xorg.conf.d:
-	sudo mkdir -p $@
+<<x220-add-fullscreen-to-vm>>
 
 desktop-look:
 	sudo apt-get install arc-theme fonts-noto
