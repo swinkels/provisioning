@@ -17,7 +17,7 @@ bootstrap:
 	sudo sed -i 's/allowed_users=.*/allowed_users=anybody/' /etc/X11/Xwrapper.config
 	# install "absolutely required" applications
 	sudo apt-get install -y policykit-1-gnome synaptic
-	sudo apt-get install -y firefox git zsh
+	sudo apt-get install -y firefox git
 
 .PHONY: depends install-emacs-dependencies append-local-to-path whiskermenu
 
@@ -117,17 +117,22 @@ $(HOME)/.zshrc.orig:
 		touch $(HOME)/.zshrc.orig ; \
 	fi
 
-zsh-config: | $(HOME)/.oh-my-zsh
+setup-zsh: install-zsh set-zsh-as-login-shell | $(HOME)/.oh-my-zsh
+
+install-zsh:
+	sudo apt-get install -y zsh
+
+set-zsh-as-login-shell:
 	@echo Set login shell of the current user to zsh. This requires you to enter
 	@echo your password and a logout \& login.
 	chsh -s $(shell which zsh)
 
 $(HOME)/.oh-my-zsh: $(HOME)/tmp/install-oh-my-zsh.sh
-	sh $(HOME)/tmp/install-oh-my-zsh.sh
+	sh $<
 
 $(HOME)/tmp/install-oh-my-zsh.sh: | $(HOME)/tmp
-	curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh > $(HOME)/tmp/install-oh-my-zsh.sh
-	sed -i '/^.*env zsh -l/d' $(HOME)/tmp/install-oh-my-zsh.sh
+	curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh > $@
+	sed -i '/^.*env zsh -l/d' $@
 
 CAPS_TO_CTRL_COMMAND="setxkbmap -option compose:rctrl -option ctrl:nocaps"
 
