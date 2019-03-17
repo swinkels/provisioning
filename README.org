@@ -366,13 +366,24 @@ $(HOME)/.emacs.d: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs
 $(LOCAL_GITHUB_REPOS_DIR)/spacemacs: | $(LOCAL_GITHUB_REPOS_DIR)
 	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/syl20bnr/spacemacs.git
 
-spacemacs-config: $(HOME)/.spacemacs $(LOCAL_GITHUB_REPOS_DIR)/oje
+spacemacs-config: $(HOME)/.spacemacs $(HOME)/.emacs.d/private/spacemacs-config $(HOME)/.emacs.d/private/journal $(LOCAL_GITHUB_REPOS_DIR)/oje
 
 $(HOME)/.spacemacs: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config/.spacemacs
 	ln -s $< $@
 
-$(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config/.spacemacs: | $(LOCAL_GITHUB_REPOS_DIR)
+$(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config/.spacemacs: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config
+
+$(HOME)/.emacs.d/private/spacemacs-config: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config
+	ln -s $< $@
+
+$(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config: | $(LOCAL_GITHUB_REPOS_DIR)
 	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/swinkels/spacemacs-config.git
+
+$(HOME)/.emacs.d/private/journal: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-journal
+	ln -s $< $@
+
+$(LOCAL_GITHUB_REPOS_DIR)/spacemacs-journal: | $(LOCAL_GITHUB_REPOS_DIR)
+	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/borgnix/spacemacs-journal.git
 
 $(LOCAL_GITHUB_REPOS_DIR)/oje: | $(LOCAL_GITHUB_REPOS_DIR)
 	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/swinkels/oje.git
