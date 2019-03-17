@@ -1,3 +1,5 @@
+import os.path
+
 from fabric import task
 
 
@@ -9,6 +11,12 @@ def sync(c):
         c.put('Makefile', 'tmp')
         c.put('40-vm-on-x220.conf', 'tmp')
 
+@task
+def sync_gitconfig(c):
+    """Sync gitconfig on host."""
+    with c.cd('/home/vagrant/'):
+        home_dir = os.path.expanduser('~/.')
+        c.put(os.path.join(home_dir, '.gitconfig'))
 
 @task
 def make(c, targets):
