@@ -348,16 +348,17 @@ emacs-clean:
 	- cd $(HOME)/external_software/$(EMACS_NAME) && make uninstall
 	- rm -rf $(HOME)/external_software/$(EMACS_NAME)
 #+END_SRC
+On my Thinkpad X220 the complete process takes about 10 minutes[fn:specs].
 
 *** Spacemacs
 
-Target *spacemacs* does two things, it installs Spacemacs and my personal
-Spacemacs configuration:
+Target *spacemacs* installs Spacemacs. If you want my personal Spacemacs
+configuration, also execute target *spacemacs-config*:
 #+BEGIN_SRC makefile :noweb-ref spacemacs
 spacemacs: install-spacemacs-dependencies $(HOME)/.emacs.d
 
 install-spacemacs-dependencies:
-	apt-get install -y fonts-powerline
+	sudo apt-get install -y fonts-powerline
 
 $(HOME)/.emacs.d: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs
 	ln -s $< $@
@@ -397,9 +398,9 @@ python-dev: | $(HOME)/.local $(HOME)/tmp
 	$(HOME)/.local/bin/pip install --user --upgrade virtualenvwrapper
 
 #+END_SRC
-We install pip to to be able to install virtualenvwrapper, a set of extensions
-to virtualenv that make it easier to manage Python virtualenvs.
-
+virtualenvwrapper is a set of shell extensions. Unfortunately these shell
+extensions are not active for zsh but target *install-virtualenvwrapper-in-zsh*
+takes care of that:
 #+BEGIN_SRC makefile :noweb-ref python-dev
 SOURCE_WRAPPER_MARKER=\$$HOME/.local/bin/virtualenvwrapper.sh
 SOURCE_WRAPPER_LINES=source $(SOURCE_WRAPPER_MARKER)
@@ -423,6 +424,7 @@ install-zsh-plugin-virtualenvwrapper: $(HOME)/.zshrc
 		sed -i -r 's/(^plugins=\()(.*)$$/\1$(WRAPPER_MARKER) \2/' $(HOME)/.zshrc ; \
 	fi
 #+END_SRC
+You have to re-login to make these shell extensions active.
 
 ** Makefile structure
 
@@ -585,3 +587,4 @@ environment variable ~VAGRANT_DEFAULT_PROVIDER~ to the desired default.
  "the virtualization module in the Linux kernel that allows the kernel to create
 and run virtual machines"[fn:kvm]
 [fn:kvm] Wikipedia articles [[https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine][Kernel-based Virtual Machine]] and [[https://en.wikipedia.org/wiki/Hypervisor][Hypervisor]]. URLs visited on January 24, 2019.
+[fn:specs] a Core i5 2.5Ghz laptop with 8 GB of internal memory and the VM on a HDD

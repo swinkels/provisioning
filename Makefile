@@ -52,7 +52,7 @@ emacs-clean:
 spacemacs: install-spacemacs-dependencies $(HOME)/.emacs.d
 
 install-spacemacs-dependencies:
-	apt-get install -y fonts-powerline
+	sudo apt-get install -y fonts-powerline
 
 $(HOME)/.emacs.d: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs
 	ln -s $< $@
