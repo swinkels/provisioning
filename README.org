@@ -29,10 +29,27 @@ in my setup, GNU make and Fabric take care of provisioning the VM.
 ** Configuration of libvirt storage pool
 
 libvirt stores VM images in a storage pool named "default" and that points to
-/var/lib/libvirt/images. That is not ideal for my main host machine as the home
+/var/lib/libvirt/images. That is not ideal for my main host machine as the root
 partition is on a smaller SSD and I added a second storage pool named "kvm-pool"
 on my second, much larger drive[fn:kvm-pool]. I did this using [[https://virt-manager.org/][virt-manager]], a
 GUI application to manage virtual machines through libvirt.
+
+** Configuration of libvirt state directory
+
+When you save a running image or create a snapshot, libvirt stores it in
+/var/lib/libvirt/qemu. These saves require quite some disk space and in no time
+I was able to fill the root partition of my main host machine. Unfortunately
+there is no way to specify another directory for these saves. To work around
+that, I recreated the /var/lib/libvirt/qemu directory structure on a partition
+with ample space and created a soft-link to that directory:
+#+BEGIN_SRC
+mkdir -p /media/data/libvirt/qemu/save /media/data/libvirt/qemu/snapshot
+chown --recursive libvirt-qemu:kvm /media/data/libvirt/qemu
+ln -s /media/data/libvirt/qemu/save /var/lib/libvirt/qemu/save
+ln -s /media/data/libvirt/qemu/snapshot /var/lib/libvirt/qemu/snapshot
+#+END_SRC
+I executed these statements with root permissions so I could access all
+directories.
 
 ** Installation of Vagrant
 
