@@ -544,10 +544,10 @@ $(HOME)/.profile.orig:
 
 desktop-look:
 	sudo apt-get install arc-theme fonts-noto
-	xfconf-query -c xfwm4 -p /general/theme -s "Arc-Dark"
-	xfconf-query -c xfwm4 -p /general/title_font -s "Noto Sans Bold 9"
-	xfconf-query -c xfwm4 -p /general/cycle_workspaces -s false
-	xfconf-query -c xfwm4 -p /general/cycle_tabwin_mode -s 1
+	xfconf-query -c xfwm4 -p /general/theme -n -t string -s "Arc-Dark"
+	xfconf-query -c xfwm4 -p /general/title_font -n -t string -s "Noto Sans Bold 9"
+	xfconf-query -c xfwm4 -p /general/cycle_workspaces -n -t bool -s false
+	xfconf-query -c xfwm4 -p /general/cycle_tabwin_mode -n -t int -s 1
 	xfconf-query -c xsettings -p /Net/ThemeName -s "Arc-Dark"
 	xfconf-query -c xsettings -p /Gtk/FontName -s "Noto Sans 9"
 	xfconf-query -c xsettings -p /Xfce/LastCustomDPI -n -t string -s 101
@@ -556,7 +556,7 @@ desktop-look:
 	xfconf-query -c xsettings -p /Xft/Hinting -s 1
 	xfconf-query -c xsettings -p /Xft/HintStyle -s "hintmedium"
 	xfconf-query -c xsettings -p /Xft/RGBA -s "rgb"
-	xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 24
+	xfconf-query -c xfce4-panel -p /panels/panel-1/size -n -t int -s 24
 
 install-community-wallpapers:
 	sudo apt-get install xubuntu-community-wallpapers
