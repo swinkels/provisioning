@@ -382,6 +382,11 @@ $(HOME)/.emacs.d: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs
 
 $(LOCAL_GITHUB_REPOS_DIR)/spacemacs: | $(LOCAL_GITHUB_REPOS_DIR)
 	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/syl20bnr/spacemacs.git
+	cd $@ && git checkout develop
+
+spacemacs-clean:
+	rm -rf $(LOCAL_GITHUB_REPOS_DIR)/spacemacs
+	rm $(HOME)/.emacs.d
 
 spacemacs-config: $(HOME)/.spacemacs $(HOME)/.emacs.d/private/spacemacs-config $(HOME)/.emacs.d/private/journal $(LOCAL_GITHUB_REPOS_DIR)/oje
 
