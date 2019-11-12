@@ -482,7 +482,8 @@ bootstrap:
 	# install "absolutely required" applications
 	sudo apt-get install -y policykit-1-gnome synaptic
 	sudo apt-get install -y browser-plugin-freshplayer-pepperflash firefox
-  sudo apt-get install -y git
+	sudo apt-get install -y git
+	sudo apt-get install -y tree
 
 .PHONY: depends install-emacs-dependencies append-local-to-path whiskermenu
 
