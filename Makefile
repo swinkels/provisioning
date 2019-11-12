@@ -17,7 +17,9 @@ bootstrap:
 	sudo sed -i 's/allowed_users=.*/allowed_users=anybody/' /etc/X11/Xwrapper.config
 	# install "absolutely required" applications
 	sudo apt-get install -y policykit-1-gnome synaptic
-	sudo apt-get install -y firefox git
+	sudo apt-get install -y browser-plugin-freshplayer-pepperflash firefox
+	sudo apt-get install -y git
+	sudo apt-get install -y tree
 
 .PHONY: depends install-emacs-dependencies append-local-to-path whiskermenu
 
@@ -59,6 +61,11 @@ $(HOME)/.emacs.d: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs
 
 $(LOCAL_GITHUB_REPOS_DIR)/spacemacs: | $(LOCAL_GITHUB_REPOS_DIR)
 	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/syl20bnr/spacemacs.git
+	cd $@ && git checkout develop
+
+spacemacs-clean:
+	rm -rf $(LOCAL_GITHUB_REPOS_DIR)/spacemacs
+	rm $(HOME)/.emacs.d
 
 spacemacs-config: $(HOME)/.spacemacs $(HOME)/.emacs.d/private/spacemacs-config $(HOME)/.emacs.d/private/journal $(LOCAL_GITHUB_REPOS_DIR)/oje
 
@@ -194,10 +201,10 @@ x220-add-fullscreen-to-vm: /etc/X11/xorg.conf.d/40-x220.conf
 
 desktop-look:
 	sudo apt-get install arc-theme fonts-noto
-	xfconf-query -c xfwm4 -p /general/theme -s "Arc-Dark"
-	xfconf-query -c xfwm4 -p /general/title_font -s "Noto Sans Bold 9"
-	xfconf-query -c xfwm4 -p /general/cycle_workspaces -s false
-	xfconf-query -c xfwm4 -p /general/cycle_tabwin_mode -s 1
+	xfconf-query -c xfwm4 -p /general/theme -n -t string -s "Arc-Dark"
+	xfconf-query -c xfwm4 -p /general/title_font -n -t string -s "Noto Sans Bold 9"
+	xfconf-query -c xfwm4 -p /general/cycle_workspaces -n -t bool -s false
+	xfconf-query -c xfwm4 -p /general/cycle_tabwin_mode -n -t int -s 1
 	xfconf-query -c xsettings -p /Net/ThemeName -s "Arc-Dark"
 	xfconf-query -c xsettings -p /Gtk/FontName -s "Noto Sans 9"
 	xfconf-query -c xsettings -p /Xfce/LastCustomDPI -n -t string -s 101
@@ -206,7 +213,7 @@ desktop-look:
 	xfconf-query -c xsettings -p /Xft/Hinting -s 1
 	xfconf-query -c xsettings -p /Xft/HintStyle -s "hintmedium"
 	xfconf-query -c xsettings -p /Xft/RGBA -s "rgb"
-	xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 24
+	xfconf-query -c xfce4-panel -p /panels/panel-1/size -n -t int -s 24
 
 install-community-wallpapers:
 	sudo apt-get install xubuntu-community-wallpapers
