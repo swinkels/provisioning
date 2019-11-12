@@ -413,11 +413,19 @@ $(LOCAL_GITHUB_REPOS_DIR)/oje: | $(LOCAL_GITHUB_REPOS_DIR)
 fonts: $(LOCAL_FONTS_DIR)/source-code-pro
 
 $(LOCAL_FONTS_DIR)/source-code-pro: $(LOCAL_GITHUB_REPOS_DIR)/source-code-pro | $(LOCAL_FONTS_DIR)
+	- rm $@
 	ln -s $< $@
 	fc-cache -f -v $@
 
 $(LOCAL_GITHUB_REPOS_DIR)/source-code-pro: | $(LOCAL_GITHUB_REPOS_DIR)
 	cd $< && git clone --branch release --depth 1 https://github.com/adobe-fonts/source-code-pro.git
+
+fonts-clean:
+	- rm $(LOCAL_FONTS_DIR)/source-code-pro
+	- rm -rf $(LOCAL_GITHUB_REPOS_DIR)/source-code-pro
+	# regenerate the font config cache after the removal of Source Code Pro
+	rm -rf ~/.cache/fontconfig
+	fc-cache -f -v
 #+END_SRC
 
 *** Python development
