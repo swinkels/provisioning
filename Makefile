@@ -106,6 +106,28 @@ fonts-clean:
 	rm -rf ~/.cache/fontconfig
 	fc-cache -f -v
 
+CLANG_NAME=clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04
+CLANG_ARCHIVE=$(CLANG_NAME).tar.xz
+
+ccls: $(HOME)/.local/bin/ccls
+
+$(HOME)/.local/bin/ccls: $(LOCAL_GITHUB_REPOS_DIR)/ccls/Release/ccls
+	ln -s $<
+
+$(LOCAL_GITHUB_REPOS_DIR)/ccls/Release/ccls: | $(LOCAL_GITHUB_REPOS_DIR)/ccls
+	cd $(LOCAL_GITHUB_REPOS_DIR)/ccls && cmake -H. -BRelease -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$(HOME)/external_software/$(CLANG_NAME)
+	cd $(LOCAL_GITHUB_REPOS_DIR)/ccls && cmake --build Release
+
+$(LOCAL_GITHUB_REPOS_DIR)/ccls: | $(HOME)/external_software/$(CLANG_NAME)
+	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone --depth=1 --recursive https://github.com/MaskRay/ccls
+
+$(HOME)/external_software/$(CLANG_NAME): $(HOME)/tmp/$(CLANG_ARCHIVE) | $(HOME)/external_software
+	tar xvf $< -C $(HOME)/external_software
+	touch $@ # so the target (directory) is newer than the archive
+
+$(HOME)/tmp/$(CLANG_ARCHIVE): | $(HOME)/tmp
+	cd $(HOME)/tmp && wget --timestamping http://releases.llvm.org/8.0.0/$(CLANG_ARCHIVE)
+
 python-dev: | $(HOME)/.local $(HOME)/tmp
 	curl -fsSL https://bootstrap.pypa.io/get-pip.py > $(HOME)/tmp/get-pip.py
 	python3 $(HOME)/tmp/get-pip.py --user

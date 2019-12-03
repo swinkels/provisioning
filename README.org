@@ -428,6 +428,39 @@ fonts-clean:
 	fc-cache -f -v
 #+END_SRC
 
+*** C++ development
+
+The C++ layer can use multiple backends to retrieve information about the C++
+code at hand, among them the C/C++ language servers [[https://github.com/cquery-project/cquery][cquery]] and [[https://github.com/MaskRay/ccls][ccls]]. First I
+tried cquery but more often than not it would not work. Then I set my sights on
+ccls, which did function.
+
+The [[https://github.com/MaskRay/ccls/wiki/Build][Build page of the ccls wiki]] documents how to build the C/C++ language
+server. Target *ccls* automates these steps:
+#+BEGIN_SRC makefile :noweb-ref c++-dev
+CLANG_NAME=clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04
+CLANG_ARCHIVE=$(CLANG_NAME).tar.xz
+
+ccls: $(HOME)/.local/bin/ccls
+
+$(HOME)/.local/bin/ccls: $(LOCAL_GITHUB_REPOS_DIR)/ccls/Release/ccls
+	ln -s $<
+
+$(LOCAL_GITHUB_REPOS_DIR)/ccls/Release/ccls: | $(LOCAL_GITHUB_REPOS_DIR)/ccls
+	cd $(LOCAL_GITHUB_REPOS_DIR)/ccls && cmake -H. -BRelease -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$(HOME)/external_software/$(CLANG_NAME)
+	cd $(LOCAL_GITHUB_REPOS_DIR)/ccls && cmake --build Release
+
+$(LOCAL_GITHUB_REPOS_DIR)/ccls: | $(HOME)/external_software/$(CLANG_NAME)
+	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone --depth=1 --recursive https://github.com/MaskRay/ccls
+
+$(HOME)/external_software/$(CLANG_NAME): $(HOME)/tmp/$(CLANG_ARCHIVE) | $(HOME)/external_software
+	tar xvf $< -C $(HOME)/external_software
+	touch $@ # so the target (directory) is newer than the archive
+
+$(HOME)/tmp/$(CLANG_ARCHIVE): | $(HOME)/tmp
+	cd $(HOME)/tmp && wget --timestamping http://releases.llvm.org/8.0.0/$(CLANG_ARCHIVE)
+#+END_SRC
+
 *** Python development
 
 Target *python-dev* installs the Python3 version of pip and virtualenvwrapper
@@ -504,6 +537,8 @@ fix-sources-list:
 <<emacs-from-source>>
 
 <<spacemacs>>
+
+<<c++-dev>>
 
 <<python-dev>>
 
