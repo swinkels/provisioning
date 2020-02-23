@@ -343,7 +343,7 @@ append-local-to-path: $(HOME)/.profile
 
 Target *emacs* builds Emacs from source and installs it locally:
 #+BEGIN_SRC makefile :noweb-ref emacs-from-source
-EMACS_VERSION=26.1
+EMACS_VERSION=26.3
 EMACS_NAME=emacs-$(EMACS_VERSION)
 EMACS_ARCHIVE=$(EMACS_NAME).tar.gz
 

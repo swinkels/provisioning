@@ -29,7 +29,7 @@ fix-sources-list:
 	sudo sed -i -r 's/^# (deb-src http.* bionic main restricted.*)/\1/' /etc/apt/sources.list
 	sudo apt-get update
 
-EMACS_VERSION=26.1
+EMACS_VERSION=26.3
 EMACS_NAME=emacs-$(EMACS_VERSION)
 EMACS_ARCHIVE=$(EMACS_NAME).tar.gz
 
