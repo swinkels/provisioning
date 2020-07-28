@@ -128,6 +128,21 @@ $(HOME)/external_software/$(CLANG_NAME): $(HOME)/tmp/$(CLANG_ARCHIVE) | $(HOME)/
 $(HOME)/tmp/$(CLANG_ARCHIVE): | $(HOME)/tmp
 	cd $(HOME)/tmp && wget --timestamping http://releases.llvm.org/8.0.0/$(CLANG_ARCHIVE)
 
+.PHONY: setup-yadm
+
+YADM_VERSION=2.4.0
+
+setup-yadm: ~/.local/bin/yadm ~/.config/yadm/repo.git
+
+~/.local/bin/yadm: | $(LOCAL_GITHUB_REPOS_DIR)/yadm
+	ln -s $</yadm $@
+
+$(LOCAL_GITHUB_REPOS_DIR)/yadm: | $(LOCAL_GITHUB_REPOS_DIR)
+	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone --branch $(YADM_VERSION) https://github.com/TheLocehiliosan/yadm.git
+
+~/.config/yadm/repo.git:
+	yadm clone git@github.com:swinkels/yadm-dotfiles.git
+
 python-dev: | $(HOME)/.local $(HOME)/tmp
 	curl -fsSL https://bootstrap.pypa.io/get-pip.py > $(HOME)/tmp/get-pip.py
 	python3 $(HOME)/tmp/get-pip.py --user

@@ -277,6 +277,36 @@ This installs the wallpapers in /usr/share/xfce4/backdrops
 - whiskermenu :: install the Whisker Menu, a panel item that can replace the
      application menu
 
+*** Install yadm
+
+[[https://yadm.io/][yadm]] is a tool to version control dotfiles in your home directory and sync them
+between multiple machines. It creates a Git repository in ~/config/yadm/repo.git
+with your home directory as its working tree. You push that Git repo to a shared
+location, e.g. GitHub, from where you pull it to have you dotfiles on another
+machine. When you clone or pull the repo, yadm automatically creates the
+dotfiles in the right location.
+
+There are other workflows and tools that (try to) do the same. yadm drew my
+attention because it allows you to (1) have different configurations for
+different machines and (2) encrypt files. I don't use these features yet and
+time will tell whether yadm is the right tool for me.
+#+BEGIN_SRC makefile :noweb-ref setup-yadm
+.PHONY: setup-yadm
+
+YADM_VERSION=2.4.0
+
+setup-yadm: ~/.local/bin/yadm ~/.config/yadm/repo.git
+
+~/.local/bin/yadm: | $(LOCAL_GITHUB_REPOS_DIR)/yadm
+	ln -s $</yadm $@
+
+$(LOCAL_GITHUB_REPOS_DIR)/yadm: | $(LOCAL_GITHUB_REPOS_DIR)
+	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone --branch $(YADM_VERSION) https://github.com/TheLocehiliosan/yadm.git
+
+~/.config/yadm/repo.git:
+	yadm clone git@github.com:swinkels/yadm-dotfiles.git
+#+END_SRC
+
 *** Setup zsh
 
 Target *setup-zsh* sets up zsh as the login shell and installs the [[https://github.com/robbyrussell/oh-my-zsh][oh-my-zsh]]
@@ -539,6 +569,8 @@ fix-sources-list:
 <<spacemacs>>
 
 <<c++-dev>>
+
+<<setup-yadm>>
 
 <<python-dev>>
 
