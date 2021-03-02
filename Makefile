@@ -10,8 +10,23 @@ PACKAGE_DIR=$(MAKEFILE_DIR)/packages
 
 .PHONY: nunhems
 
-nunhems: yadm
-	# 
+nunhems: yadm tmux
+	# Done!
+
+.PHONY: tmux
+
+TMUX_VERSION=3.1b
+TMUX_APP_IMAGE=tmux-$(TMUX_VERSION)-x86_64.AppImage
+
+tmux: ~/.local/bin/tmux
+
+~/.local/bin/tmux: $(PACKAGE_DIR)/$(TMUX_APP_IMAGE)
+	# Link the tmux AppImage to a directory in PATH 
+	ln -s $< $@
+
+$(PACKAGE_DIR)/$(TMUX_APP_IMAGE): | $(PACKAGE_DIR)
+	# Download tmux version $(TMUX_VERSION) to the packages directory
+	cd $(PACKAGE_DIR) && wget https://github.com/tmux/tmux/releases/download/$(TMUX_VERSION)/$(TMUX_APP_IMAGE) && chmod 700 $(TMUX_APP_IMAGE)
 
 $(PACKAGE_DIR):
 	# Create the directory to store packages
