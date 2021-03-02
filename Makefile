@@ -1,5 +1,21 @@
 LOCAL_FONTS_DIR=$(HOME)/.local/share/fonts
 LOCAL_GITHUB_REPOS_DIR=$(HOME)/repos/github.com
+GIT_REPOS_DIR=$(HOME)/repos/git
+
+# the following line to find the directory of this Makefile is from here:
+# https://stackoverflow.com/a/23324703
+MAKEFILE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+
+PACKAGE_DIR=$(MAKEFILE_DIR)/packages
+
+.PHONY: nunhems
+
+nunhems: yadm
+	# 
+
+$(PACKAGE_DIR):
+	# Create the directory to store packages
+	- mkdir -p $(PACKAGE_DIR)
 
 bootstrap:
 	# set the local time to CET
@@ -128,20 +144,28 @@ $(HOME)/external_software/$(CLANG_NAME): $(HOME)/tmp/$(CLANG_ARCHIVE) | $(HOME)/
 $(HOME)/tmp/$(CLANG_ARCHIVE): | $(HOME)/tmp
 	cd $(HOME)/tmp && wget --timestamping http://releases.llvm.org/8.0.0/$(CLANG_ARCHIVE)
 
-.PHONY: setup-yadm
+.PHONY: yadm yadm-install
 
 YADM_VERSION=2.4.0
 
-setup-yadm: ~/.local/bin/yadm ~/.config/yadm/repo.git
+yadm: yadm-install | ~/.config/yadm/repo.git
 
-~/.local/bin/yadm: | $(LOCAL_GITHUB_REPOS_DIR)/yadm
-	ln -s $</yadm $@
+yadm-install: ~/.local/bin/yadm
 
-$(LOCAL_GITHUB_REPOS_DIR)/yadm: | $(LOCAL_GITHUB_REPOS_DIR)
-	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone --branch $(YADM_VERSION) https://github.com/TheLocehiliosan/yadm.git
+~/.local/bin/yadm: | $(PACKAGE_DIR)/yadm
+	# Link the yadm script to a directory in PATH 
+	ln -s $(PACKAGE_DIR)/yadm/yadm $@
+
+$(PACKAGE_DIR)/yadm: | $(PACKAGE_DIR)
+	# Clone yadm version $(YADM_VERSION) to the packages directory
+	cd $(PACKAGE_DIR) && git clone --branch $(YADM_VERSION) https://github.com/TheLocehiliosan/yadm.git
 
 ~/.config/yadm/repo.git:
-	yadm clone git@github.com:swinkels/yadm-dotfiles.git
+	# Let yadm clone my personal set of dotfiles
+	yadm clone https://github.com/swinkels/yadm-dotfiles.git
+
+
+
 
 python-dev: | $(HOME)/.local $(HOME)/tmp
 	curl -fsSL https://bootstrap.pypa.io/get-pip.py > $(HOME)/tmp/get-pip.py
