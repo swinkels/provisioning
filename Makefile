@@ -10,8 +10,27 @@ PACKAGE_DIR=$(MAKEFILE_DIR)/packages
 
 .PHONY: nunhems
 
-nunhems: yadm tmux
+nunhems: ripgrep tmux yadm 
 	# Done!
+
+.PHONY: ripgrep
+
+RIP_GREP_VERSION=12.1.1
+RIP_GREP_PACKAGE=ripgrep-$(RIP_GREP_VERSION)-x86_64-unknown-linux-musl
+
+ripgrep: ~/.local/bin/rg
+
+~/.local/bin/rg: $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE)/rg
+	# Link the ripgrep binary to a directory in PATH 
+	ln -s $< $@
+
+$(PACKAGE_DIR)/$(RIP_GREP_PACKAGE)/rg: $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.gz 
+	# Uncompress ripgrep archive
+	cd $(PACKAGE_DIR) && tar xvzf $(RIP_GREP_PACKAGE).tar.gz
+
+$(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.gz:
+	# Download ripgrep version $(RIP_GREP_VERSION) to the packages directory
+	cd $(PACKAGE_DIR) && wget https://github.com/BurntSushi/ripgrep/releases/download/$(RIP_GREP_VERSION)/$(RIP_GREP_PACKAGE).tar.gz
 
 .PHONY: tmux
 
