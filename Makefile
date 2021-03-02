@@ -21,17 +21,17 @@ KEYCHAIN_PACKAGE_DIR=keychain-$(KEYCHAIN_VERSION)
 EVAL_KEYCHAIN_COMMAND="eval \`keychain --eval --agents ssh id_rsa\`"
 
 keychain: ~/.local/bin/keychain
-	# Let bash profile evaluate keychain
-	if ! grep -q $(EVAL_KEYCHAIN_COMMAND) $(HOME)/.bash_profile; then \
-		echo >> $(HOME)/.bash_profile ; \
-		echo "$(EVAL_KEYCHAIN_COMMAND)" >> $(HOME)/.bash_profile ; \
-	fi
 
 ~/.local/bin/keychain: $(PACKAGE_DIR)/$(KEYCHAIN_PACKAGE_DIR)/keychain
 	# Link the ripgrep binary to a directory in PATH 
 	ln -s $< $@
+	# Let bash profile evaluate keychain
+	@if ! grep -q $(EVAL_KEYCHAIN_COMMAND) $(HOME)/.bash_profile; then \
+		echo >> $(HOME)/.bash_profile ; \
+		echo "$(EVAL_KEYCHAIN_COMMAND)" >> $(HOME)/.bash_profile ; \
+	fi
 
-$(PACKAGE_DIR)/$(KEYCHAIN_PACKAGE_DIR)/keychain: $(PACKAGE_DIR)/$(KEYCHAIN_VERSION).tar.gz
+$(PACKAGE_DIR)/$(KEYCHAIN_PACKAGE_DIR)/keychain: | $(PACKAGE_DIR)/$(KEYCHAIN_VERSION).tar.gz
 	# Uncompress keychain archive
 	cd $(PACKAGE_DIR) && tar xvzf $(KEYCHAIN_VERSION).tar.gz && chmod 700 $(KEYCHAIN_PACKAGE_DIR)/keychain
 
@@ -50,7 +50,7 @@ ripgrep: ~/.local/bin/rg
 	# Link the ripgrep binary to a directory in PATH 
 	ln -s $< $@
 
-$(PACKAGE_DIR)/$(RIP_GREP_PACKAGE)/rg: $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.gz 
+$(PACKAGE_DIR)/$(RIP_GREP_PACKAGE)/rg: | $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.gz 
 	# Uncompress ripgrep archive
 	cd $(PACKAGE_DIR) && tar xvzf $(RIP_GREP_PACKAGE).tar.gz
 
