@@ -10,8 +10,34 @@ PACKAGE_DIR=$(MAKEFILE_DIR)/packages
 
 .PHONY: nunhems
 
-nunhems: ripgrep tmux yadm 
+nunhems: keychain ripgrep tmux yadm 
 	# Done!
+
+.PHONY: keychain
+
+KEYCHAIN_VERSION=2.8.5
+KEYCHAIN_PACKAGE_DIR=keychain-$(KEYCHAIN_VERSION)
+
+EVAL_KEYCHAIN_COMMAND="eval \`keychain --eval --agents ssh id_rsa\`"
+
+keychain: ~/.local/bin/keychain
+	# Let bash profile evaluate keychain
+	if ! grep -q $(EVAL_KEYCHAIN_COMMAND) $(HOME)/.bash_profile; then \
+		echo >> $(HOME)/.bash_profile ; \
+		echo "$(EVAL_KEYCHAIN_COMMAND)" >> $(HOME)/.bash_profile ; \
+	fi
+
+~/.local/bin/keychain: $(PACKAGE_DIR)/$(KEYCHAIN_PACKAGE_DIR)/keychain
+	# Link the ripgrep binary to a directory in PATH 
+	ln -s $< $@
+
+$(PACKAGE_DIR)/$(KEYCHAIN_PACKAGE_DIR)/keychain: $(PACKAGE_DIR)/$(KEYCHAIN_VERSION).tar.gz
+	# Uncompress keychain archive
+	cd $(PACKAGE_DIR) && tar xvzf $(KEYCHAIN_VERSION).tar.gz && chmod 700 $(KEYCHAIN_PACKAGE_DIR)/keychain
+
+$(PACKAGE_DIR)/$(KEYCHAIN_VERSION).tar.gz:
+	# Download keychain version $(KEYCHAIN_VERSION) to the packages directory
+	cd $(PACKAGE_DIR) && wget https://github.com/funtoo/keychain/archive/$(KEYCHAIN_VERSION).tar.gz
 
 .PHONY: ripgrep
 
