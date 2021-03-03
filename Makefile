@@ -10,7 +10,7 @@ PACKAGE_DIR=$(MAKEFILE_DIR)/packages
 
 .PHONY: nunhems
 
-nunhems: keychain ripgrep tmux yadm 
+nunhems: keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
 	# Done!
 
 .PHONY: keychain
@@ -136,8 +136,11 @@ $(HOME)/.emacs.d: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs
 	ln -s $< $@
 
 $(LOCAL_GITHUB_REPOS_DIR)/spacemacs: | $(LOCAL_GITHUB_REPOS_DIR)
-	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/syl20bnr/spacemacs.git
-	cd $@ && git checkout develop
+	# Uncompress existing spacemacs installation
+	tar xvzf $(PACKAGE_DIR)/spacemacs.tgz -C $(LOCAL_GITHUB_REPOS_DIR)
+	# Remove existing links to private packages
+	rm $@/private/journal
+	rm $@/private/spacemacs-config
 
 spacemacs-clean:
 	rm -rf $(LOCAL_GITHUB_REPOS_DIR)/spacemacs
@@ -154,7 +157,10 @@ $(HOME)/.emacs.d/private/spacemacs-config: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-c
 	ln -s $< $@
 
 $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config: | $(LOCAL_GITHUB_REPOS_DIR)
+	# Clone my spacemacs config to the packages directory
 	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/swinkels/spacemacs-config.git
+	# Checkout the commit that matches the spacemacs installation
+	cd $@ && git checkout 9cc0d00
 
 $(HOME)/.emacs.d/private/journal: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-journal
 	ln -s $< $@
