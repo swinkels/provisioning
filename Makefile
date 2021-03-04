@@ -17,8 +17,12 @@ nunhems: git keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
 
 GIT_VERSION=2.30.1
 
-git: ~/.local/bin/git
+git: curl-devel ~/.local/bin/git
 
+# you need to compite git with curl-devel present, otherwise it cannot use the
+# "remote helper for https": https://stackoverflow.com/a/13018777
+~/.local/bin/git: export CPPFLAGS=-I($HOME)/.local/include/
+~/.local/bin/git: export LDFLAGS=-L($HOME)/.local/lib/
 ~/.local/bin/git: $(PACKAGE_DIR)/git-$(GIT_VERSION)
 	cd $< && autoconf && ./configure --prefix=$(HOME)/.local && make && make install
 
@@ -26,7 +30,22 @@ $(PACKAGE_DIR)/git-$(GIT_VERSION): $(PACKAGE_DIR)/v$(GIT_VERSION).tar.gz
 	tar xvzf $< -C $(PACKAGE_DIR)
 
 $(PACKAGE_DIR)/v$(GIT_VERSION).tar.gz:
-	wget --directory-prefix=$(PACKAGE_DIR) https://github.com/git/git/archive/v2.30.1.tar.gz
+	wget --directory-prefix=$(PACKAGE_DIR) https://github.com/git/git/archive/v$(GIT_VERSION).tar.gz
+
+.PHONY: curl-devel
+
+CURL_VERSION=7.75.0
+
+curl-devel: ~/.local/bin/curl
+
+~/.local/bin/curl: $(PACKAGE_DIR)/curl-$(CURL_VERSION)
+	cd $< && ./configure --prefix=$(HOME)/.local && make && make install
+
+$(PACKAGE_DIR)/curl-$(CURL_VERSION): $(PACKAGE_DIR)/curl-$(CURL_VERSION).tar.gz
+	tar xvzf $< -C $(PACKAGE_DIR)
+
+$(PACKAGE_DIR)/curl-$(CURL_VERSION).tar.gz:
+	wget --directory-prefix=$(PACKAGE_DIR) https://curl.se/download/curl-$(CURL_VERSION).tar.gz
 
 .PHONY: keychain
 
@@ -38,7 +57,7 @@ EVAL_KEYCHAIN_COMMAND="eval \`keychain --eval --agents ssh id_rsa\`"
 keychain: ~/.local/bin/keychain
 
 ~/.local/bin/keychain: $(PACKAGE_DIR)/$(KEYCHAIN_PACKAGE_DIR)/keychain
-	# Link the ripgrep binary to a directory in PATH 
+	# Link the ripgrep binary to a directory in PATH
 	ln -s $< $@
 	# Let bash profile evaluate keychain
 	@if ! grep -q $(EVAL_KEYCHAIN_COMMAND) $(HOME)/.bash_profile; then \
@@ -62,10 +81,10 @@ RIP_GREP_PACKAGE=ripgrep-$(RIP_GREP_VERSION)-x86_64-unknown-linux-musl
 ripgrep: ~/.local/bin/rg
 
 ~/.local/bin/rg: $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE)/rg
-	# Link the ripgrep binary to a directory in PATH 
+	# Link the ripgrep binary to a directory in PATH
 	ln -s $< $@
 
-$(PACKAGE_DIR)/$(RIP_GREP_PACKAGE)/rg: | $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.gz 
+$(PACKAGE_DIR)/$(RIP_GREP_PACKAGE)/rg: | $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.gz
 	# Uncompress ripgrep archive
 	cd $(PACKAGE_DIR) && tar xvzf $(RIP_GREP_PACKAGE).tar.gz
 
@@ -81,7 +100,7 @@ TMUX_APP_IMAGE=tmux-$(TMUX_VERSION)-x86_64.AppImage
 tmux: ~/.local/bin/tmux
 
 ~/.local/bin/tmux: $(PACKAGE_DIR)/$(TMUX_APP_IMAGE)
-	# Link the tmux AppImage to a directory in PATH 
+	# Link the tmux AppImage to a directory in PATH
 	ln -s $< $@
 
 $(PACKAGE_DIR)/$(TMUX_APP_IMAGE): | $(PACKAGE_DIR)
@@ -234,7 +253,7 @@ yadm: yadm-install | ~/.config/yadm/repo.git
 yadm-install: ~/.local/bin/yadm
 
 ~/.local/bin/yadm: | $(PACKAGE_DIR)/yadm
-	# Link the yadm script to a directory in PATH 
+	# Link the yadm script to a directory in PATH
 	ln -s $(PACKAGE_DIR)/yadm/yadm $@
 
 $(PACKAGE_DIR)/yadm: | $(PACKAGE_DIR)
