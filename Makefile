@@ -10,8 +10,23 @@ PACKAGE_DIR=$(MAKEFILE_DIR)/packages
 
 .PHONY: nunhems
 
-nunhems: keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
+nunhems: git keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
 	# Done!
+
+.PHONY: git
+
+GIT_VERSION=2.30.1
+
+git: ~/.local/bin/git
+
+~/.local/bin/git: $(PACKAGE_DIR)/git-$(GIT_VERSION)
+	cd $< && autoconf && ./configure --prefix=$(HOME)/.local && make && make install
+
+$(PACKAGE_DIR)/git-$(GIT_VERSION): $(PACKAGE_DIR)/v$(GIT_VERSION).tar.gz
+	tar xvzf $< -C $(PACKAGE_DIR)
+
+$(PACKAGE_DIR)/v$(GIT_VERSION).tar.gz:
+	wget --directory-prefix=$(PACKAGE_DIR) https://github.com/git/git/archive/v2.30.1.tar.gz
 
 .PHONY: keychain
 
