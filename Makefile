@@ -269,7 +269,7 @@ ifeq ($(PROVISIONING_ENV), Nunhems)
 	yadm gitconfig user.email swinkels.pieter@yahoo.com
 	yadm config local.class $(PROVISIONING_ENV)
 else
-	@echo No additional configuration of yadm is specified
+	@true
 endif
 
 $(PACKAGE_DIR)/yadm: | $(PACKAGE_DIR)
