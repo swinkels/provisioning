@@ -8,6 +8,11 @@ MAKEFILE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 PACKAGE_DIR=$(MAKEFILE_DIR)/packages
 
+.PHONY: default-target
+
+default-target:
+	$(error Please specify an explicit target)
+
 .PHONY: nunhems
 
 nunhems: PROVISIONING_ENV=Nunhems
