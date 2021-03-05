@@ -12,7 +12,7 @@ PACKAGE_DIR=$(MAKEFILE_DIR)/packages
 
 nunhems: PROVISIONING_ENV=Nunhems
 nunhems: git keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
-	# Done!
+	# The following packages should be available: $^
 
 .PHONY: git
 
