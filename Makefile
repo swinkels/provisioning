@@ -20,7 +20,7 @@ GIT_VERSION=2.30.1
 
 git: curl-devel ~/.local/bin/git
 
-# you need to compite git with curl-devel present, otherwise it cannot use the
+# you need to compile git with curl-devel present, otherwise it cannot use the
 # "remote helper for https": https://stackoverflow.com/a/13018777
 ~/.local/bin/git: export CPPFLAGS=-I$(HOME)/.local/include/
 ~/.local/bin/git: export LDFLAGS=-L$(HOME)/.local/lib/
@@ -245,22 +245,27 @@ $(HOME)/external_software/$(CLANG_NAME): $(HOME)/tmp/$(CLANG_ARCHIVE) | $(HOME)/
 $(HOME)/tmp/$(CLANG_ARCHIVE): | $(HOME)/tmp
 	cd $(HOME)/tmp && wget --timestamping http://releases.llvm.org/8.0.0/$(CLANG_ARCHIVE)
 
-.PHONY: yadm yadm-install
+.PHONY: yadm yadm-install yadm-config
 
 YADM_VERSION=2.4.0
 
-yadm: yadm-install | ~/.config/yadm/repo.git
+yadm: yadm-install yadm-config | ~/.config/yadm/repo.git
 
 yadm-install: ~/.local/bin/yadm
 
 ~/.local/bin/yadm: | $(PACKAGE_DIR)/yadm
 	# Link the yadm script to a directory in PATH
 	ln -s $(PACKAGE_DIR)/yadm/yadm $@
-#ifeq ($(PROVISIONING_ENV), "Nunhems")
+
+yadm-config:
+ifeq ($(PROVISIONING_ENV), Nunhems)
+	# Configure yadm for use at $(PROVISIONING_ENV)
 	yadm gitconfig user.name "Pieter Swinkels"
 	yadm gitconfig user.email swinkels.pieter@yahoo.com
 	yadm config local.class $(PROVISIONING_ENV)
-#endif
+else
+	@echo No additional configuration of yadm is specified
+endif
 
 $(PACKAGE_DIR)/yadm: | $(PACKAGE_DIR)
 	# Clone yadm version $(YADM_VERSION) to the packages directory
@@ -269,9 +274,6 @@ $(PACKAGE_DIR)/yadm: | $(PACKAGE_DIR)
 ~/.config/yadm/repo.git:
 	# Let yadm clone my personal set of dotfiles
 	yadm clone https://github.com/swinkels/yadm-dotfiles.git
-
-
-
 
 python-dev: | $(HOME)/.local $(HOME)/tmp
 	curl -fsSL https://bootstrap.pypa.io/get-pip.py > $(HOME)/tmp/get-pip.py
