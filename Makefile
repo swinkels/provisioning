@@ -10,6 +10,7 @@ PACKAGE_DIR=$(MAKEFILE_DIR)/packages
 
 .PHONY: nunhems
 
+nunhems: PROVISIONING_ENV=Nunhems
 nunhems: git keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
 	# Done!
 
@@ -255,6 +256,11 @@ yadm-install: ~/.local/bin/yadm
 ~/.local/bin/yadm: | $(PACKAGE_DIR)/yadm
 	# Link the yadm script to a directory in PATH
 	ln -s $(PACKAGE_DIR)/yadm/yadm $@
+#ifeq ($(PROVISIONING_ENV), "Nunhems")
+	yadm gitconfig user.name "Pieter Swinkels"
+	yadm gitconfig user.email swinkels.pieter@yahoo.com
+	yadm config local.class $(PROVISIONING_ENV)
+#endif
 
 $(PACKAGE_DIR)/yadm: | $(PACKAGE_DIR)
 	# Clone yadm version $(YADM_VERSION) to the packages directory
