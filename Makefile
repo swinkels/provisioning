@@ -21,8 +21,8 @@ git: curl-devel ~/.local/bin/git
 
 # you need to compite git with curl-devel present, otherwise it cannot use the
 # "remote helper for https": https://stackoverflow.com/a/13018777
-~/.local/bin/git: export CPPFLAGS=-I($HOME)/.local/include/
-~/.local/bin/git: export LDFLAGS=-L($HOME)/.local/lib/
+~/.local/bin/git: export CPPFLAGS=-I$(HOME)/.local/include/
+~/.local/bin/git: export LDFLAGS=-L$(HOME)/.local/lib/
 ~/.local/bin/git: $(PACKAGE_DIR)/git-$(GIT_VERSION)
 	cd $< && autoconf && ./configure --prefix=$(HOME)/.local && make && make install
 
