@@ -16,8 +16,27 @@ default-target:
 .PHONY: nunhems
 
 nunhems: PROVISIONING_ENV=Nunhems
-nunhems: git keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
+nunhems: restic git keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
 	# The following packages should be available: $^
+
+.PHONY: restic
+
+RESTIC_VERSION=0.12.0
+RESTIC_PACKAGE=restic_$(RESTIC_VERSION)_linux_amd64
+
+restic: ~/.local/bin/restic
+
+~/.local/bin/restic: $(PACKAGE_DIR)/$(RESTIC_PACKAGE)
+	# Link the restic binary to a directory in PATH
+	ln -s $< $@
+
+$(PACKAGE_DIR)/$(RESTIC_PACKAGE): | $(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2
+	# Uncompress restic archive
+	cd $(PACKAGE_DIR) && bzip2 --decompress $(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2 && chmod 700 $(RESTIC_PACKAGE)
+
+$(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2:
+	# Download restic version $(RESTIC_VERSION) to the packages directory
+	wget --directory-prefix=$(PACKAGE_DIR) https://github.com/restic/restic/releases/download/v$(RESTIC_VERSION)/$(RESTIC_PACKAGE).bz2
 
 .PHONY: git
 
