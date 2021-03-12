@@ -58,10 +58,11 @@ $(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2:
 
 GIT_VERSION=2.30.1
 
-git: curl-devel ~/.local/bin/git
+git: curl ~/.local/bin/git
 
-# you need to compile git with curl-devel present, otherwise it cannot use the
-# "remote helper for https": https://stackoverflow.com/a/13018777
+# You need to compile git with curl-devel present, otherwise it cannot use the
+# "remote helper for https" (https://stackoverflow.com/a/13018777) To install
+# curl-devel from source, you compile and install the curl source package.
 ~/.local/bin/git: export CPPFLAGS=-I$(HOME)/.local/include/
 ~/.local/bin/git: export LDFLAGS=-L$(HOME)/.local/lib/
 ~/.local/bin/git: $(PACKAGE_DIR)/git-$(GIT_VERSION)
@@ -73,29 +74,35 @@ $(PACKAGE_DIR)/git-$(GIT_VERSION): $(PACKAGE_DIR)/v$(GIT_VERSION).tar.gz
 $(PACKAGE_DIR)/v$(GIT_VERSION).tar.gz:
 	wget --directory-prefix=$(PACKAGE_DIR) https://github.com/git/git/archive/v$(GIT_VERSION).tar.gz
 
-# ** curl-devel
+# ** curl
 
-.PHONY: curl-devel
+.PHONY: curl
 
 CURL_VERSION=7.75.0
+CURL_ARCHIVE_DIR=curl-$(CURL_VERSION)
+CURL_ARCHIVE=$(CURL_ARCHIVE_DIR).tar.gz
 
-curl-devel: ~/.local/bin/curl
+curl: ~/.local/bin/curl
 
 ~/.local/bin/curl: $(STOW_DIR)/curl
 	# Install curl using stow
 	stow curl
 
-$(STOW_DIR)/curl: $(PACKAGE_DIR)/curl-$(CURL_VERSION)
-	# Build curl from source and install to stow directory
-	cd $< && ./configure --prefix=$(STOW_DIR)/curl && make && make install
+$(STOW_DIR)/curl: $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)/bin/curl
+	# Install curl to stow directory
+	cd $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR) && make install
 
-$(PACKAGE_DIR)/curl-$(CURL_VERSION): $(PACKAGE_DIR)/curl-$(CURL_VERSION).tar.gz
+$(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)/bin/curl: $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)
+	# Build curl from source
+	cd $< && ./configure --prefix=$(STOW_DIR)/curl && make
+
+$(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR): $(PACKAGE_DIR)/$(CURL_ARCHIVE)
 	# Uncompress curl source package
 	tar xvzf $< -C $(PACKAGE_DIR)
 
-$(PACKAGE_DIR)/curl-$(CURL_VERSION).tar.gz:
+$(PACKAGE_DIR)/$(CURL_ARCHIVE):
 	# Download curl source package to the packages directory
-	wget --timestamping --directory-prefix=$(PACKAGE_DIR) https://curl.se/download/curl-$(CURL_VERSION).tar.gz
+	wget --timestamping --directory-prefix=$(PACKAGE_DIR) https://curl.se/download/$(CURL_ARCHIVE)
 
 # ** keychain
 
