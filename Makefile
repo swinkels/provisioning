@@ -1,3 +1,7 @@
+# -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
+
+# * Main variables
+
 LOCAL_FONTS_DIR=$(HOME)/.local/share/fonts
 LOCAL_GITHUB_REPOS_DIR=$(HOME)/repos/github.com
 GIT_REPOS_DIR=$(HOME)/repos/git
@@ -8,16 +12,24 @@ MAKEFILE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 PACKAGE_DIR=$(MAKEFILE_DIR)/packages
 
+# * Default target
+
 .PHONY: default-target
 
 default-target:
 	$(error Please specify an explicit target)
+
+# * Provisioning targets
 
 .PHONY: nunhems
 
 nunhems: PROVISIONING_ENV=Nunhems
 nunhems: restic git keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
 	# The following packages should be available: $^
+
+# * Application installation & configuration
+
+# ** restic
 
 .PHONY: restic
 
@@ -38,6 +50,8 @@ $(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2:
 	# Download restic version $(RESTIC_VERSION) to the packages directory
 	wget --directory-prefix=$(PACKAGE_DIR) https://github.com/restic/restic/releases/download/v$(RESTIC_VERSION)/$(RESTIC_PACKAGE).bz2
 
+# ** git
+
 .PHONY: git
 
 GIT_VERSION=2.30.1
@@ -57,6 +71,8 @@ $(PACKAGE_DIR)/git-$(GIT_VERSION): $(PACKAGE_DIR)/v$(GIT_VERSION).tar.gz
 $(PACKAGE_DIR)/v$(GIT_VERSION).tar.gz:
 	wget --directory-prefix=$(PACKAGE_DIR) https://github.com/git/git/archive/v$(GIT_VERSION).tar.gz
 
+# ** curl-devel
+
 .PHONY: curl-devel
 
 CURL_VERSION=7.75.0
@@ -71,6 +87,8 @@ $(PACKAGE_DIR)/curl-$(CURL_VERSION): $(PACKAGE_DIR)/curl-$(CURL_VERSION).tar.gz
 
 $(PACKAGE_DIR)/curl-$(CURL_VERSION).tar.gz:
 	wget --directory-prefix=$(PACKAGE_DIR) https://curl.se/download/curl-$(CURL_VERSION).tar.gz
+
+# ** keychain
 
 .PHONY: keychain
 
@@ -98,6 +116,8 @@ $(PACKAGE_DIR)/$(KEYCHAIN_VERSION).tar.gz:
 	# Download keychain version $(KEYCHAIN_VERSION) to the packages directory
 	cd $(PACKAGE_DIR) && wget https://github.com/funtoo/keychain/archive/$(KEYCHAIN_VERSION).tar.gz
 
+# ** ripgrep
+
 .PHONY: ripgrep
 
 RIP_GREP_VERSION=12.1.1
@@ -116,6 +136,8 @@ $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE)/rg: | $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.
 $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.gz:
 	# Download ripgrep version $(RIP_GREP_VERSION) to the packages directory
 	cd $(PACKAGE_DIR) && wget https://github.com/BurntSushi/ripgrep/releases/download/$(RIP_GREP_VERSION)/$(RIP_GREP_PACKAGE).tar.gz
+
+# ** tmux
 
 .PHONY: tmux
 
@@ -298,6 +320,8 @@ $(PACKAGE_DIR)/yadm: | $(PACKAGE_DIR)
 ~/.config/yadm/repo.git:
 	# Let yadm clone my personal set of dotfiles
 	yadm clone https://github.com/swinkels/yadm-dotfiles.git
+
+# * Backup
 
 RESTIC_BACKUP_REPO=$(HOME)/backup/restic/$(shell hostname)
 
