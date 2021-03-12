@@ -2,7 +2,9 @@
 
 # * Main variables
 
-export STOW_DIR=$(HOME)/.local/stow
+ifeq ($(STOW_DIR),)
+export STOW_DIR=~/.local/stow
+endif
 
 LOCAL_FONTS_DIR=$(HOME)/.local/share/fonts
 LOCAL_GITHUB_REPOS_DIR=$(HOME)/repos/github.com
@@ -162,6 +164,10 @@ STOW_ARCHIVE_DIR=stow-$(STOW_VERSION)
 STOW_ARCHIVE=$(STOW_ARCHIVE_DIR).tar.gz
 
 stow: ~/.local/bin/stow
+	@if ! grep -q "export STOW_DIR=" $(HOME)/.bash_profile; then \
+		echo >> $(HOME)/.bash_profile ; \
+		echo "export STOW_DIR=$(STOW_DIR)" >> $(HOME)/.bash_profile ; \
+	fi
 
 ~/.local/bin/stow: $(PACKAGE_DIR)/$(STOW_ARCHIVE_DIR)/bin/stow
 	# Install stow
