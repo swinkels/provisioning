@@ -24,7 +24,7 @@ default-target:
 .PHONY: nunhems
 
 nunhems: PROVISIONING_ENV=Nunhems
-nunhems: restic git keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
+nunhems: stow restic git keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
 	# The following packages should be available: $^
 
 # * Application installation & configuration
@@ -136,6 +136,32 @@ $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE)/rg: | $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.
 $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.gz:
 	# Download ripgrep version $(RIP_GREP_VERSION) to the packages directory
 	cd $(PACKAGE_DIR) && wget https://github.com/BurntSushi/ripgrep/releases/download/$(RIP_GREP_VERSION)/$(RIP_GREP_PACKAGE).tar.gz
+
+# ** stow
+
+.PHONY: stow
+
+STOW_VERSION=2.3.1
+STOW_ARCHIVE_DIR=stow-$(STOW_VERSION)
+STOW_ARCHIVE=$(STOW_ARCHIVE_DIR).tar.gz
+
+stow: ~/.local/bin/stow
+
+~/.local/bin/stow: $(PACKAGE_DIR)/$(STOW_ARCHIVE_DIR)/bin/stow
+	# Install stow
+	cd $(PACKAGE_DIR)/$(STOW_ARCHIVE_DIR) && make install
+
+$(PACKAGE_DIR)/$(STOW_ARCHIVE_DIR)/bin/stow: $(PACKAGE_DIR)/$(STOW_ARCHIVE_DIR)
+	# Build stow from source
+	cd $< && ./configure --prefix=$(HOME)/.local && make
+
+$(PACKAGE_DIR)/$(STOW_ARCHIVE_DIR): $(PACKAGE_DIR)/$(STOW_ARCHIVE)
+	# Uncompress stow source package
+	tar xvzf $< --directory $(PACKAGE_DIR)
+
+$(PACKAGE_DIR)/$(STOW_ARCHIVE):
+	# Download stow source package to the packages directory
+	wget --timestamping --directory-prefix=$(PACKAGE_DIR) https://ftp.gnu.org/gnu/stow/$(STOW_ARCHIVE)
 
 # ** tmux
 
