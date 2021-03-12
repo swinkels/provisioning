@@ -299,6 +299,21 @@ $(PACKAGE_DIR)/yadm: | $(PACKAGE_DIR)
 	# Let yadm clone my personal set of dotfiles
 	yadm clone https://github.com/swinkels/yadm-dotfiles.git
 
+RESTIC_BACKUP_REPO=$(HOME)/backup/restic/$(shell hostname)
+
+.PHONY: backup
+
+backup: $(RESTIC_BACKUP_REPO)
+ifeq ($(PROVISIONING_ENV), Nunhems)
+	# Let restic create a backup
+	restic -r $(RESTIC_BACKUP_REPO) backup $(HOME)/repos/git/provisioning $(HOME)/repos/github.com/spacemacs $(HOME)/.ssh $(HOME)/.git-credentials
+else
+	# No backup rules defined for the current provisioning environment
+endif
+
+$(RESTIC_BACKUP_REPO):
+	$(error Unable to create backup: there is no restic backup repository at $@)
+
 python-dev: | $(HOME)/.local $(HOME)/tmp
 	curl -fsSL https://bootstrap.pypa.io/get-pip.py > $(HOME)/tmp/get-pip.py
 	python3 $(HOME)/tmp/get-pip.py --user
