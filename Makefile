@@ -2,6 +2,8 @@
 
 # * Main variables
 
+export STOW_DIR=$(HOME)/.local/stow
+
 LOCAL_FONTS_DIR=$(HOME)/.local/share/fonts
 LOCAL_GITHUB_REPOS_DIR=$(HOME)/repos/github.com
 GIT_REPOS_DIR=$(HOME)/repos/git
@@ -79,14 +81,21 @@ CURL_VERSION=7.75.0
 
 curl-devel: ~/.local/bin/curl
 
-~/.local/bin/curl: $(PACKAGE_DIR)/curl-$(CURL_VERSION)
-	cd $< && ./configure --prefix=$(HOME)/.local && make && make install
+~/.local/bin/curl: $(STOW_DIR)/curl
+	# Install curl using stow
+	stow curl
+
+$(STOW_DIR)/curl: $(PACKAGE_DIR)/curl-$(CURL_VERSION)
+	# Build curl from source and install to stow directory
+	cd $< && ./configure --prefix=$(STOW_DIR)/curl && make && make install
 
 $(PACKAGE_DIR)/curl-$(CURL_VERSION): $(PACKAGE_DIR)/curl-$(CURL_VERSION).tar.gz
+	# Uncompress curl source package
 	tar xvzf $< -C $(PACKAGE_DIR)
 
 $(PACKAGE_DIR)/curl-$(CURL_VERSION).tar.gz:
-	wget --directory-prefix=$(PACKAGE_DIR) https://curl.se/download/curl-$(CURL_VERSION).tar.gz
+	# Download curl source package to the packages directory
+	wget --timestamping --directory-prefix=$(PACKAGE_DIR) https://curl.se/download/curl-$(CURL_VERSION).tar.gz
 
 # ** keychain
 
