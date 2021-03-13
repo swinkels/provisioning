@@ -20,18 +20,29 @@ WGET_OPTIONS=--timestamping --directory-prefix=$(PACKAGE_DIR)
 
 # * Default target
 
-.PHONY: default-target
+.PHONY: default-target no-target
 
-default-target:
+ifeq ($(PROVISIONING_ENV), Nunhems)
+TARGET=nunhems
+else
+TARGET=no-target
+endif
+
+default-target: $(TARGET)
+
+no-target:
 	$(error Please specify an explicit target)
 
 # * Provisioning targets
 
 .PHONY: nunhems
 
-nunhems: PROVISIONING_ENV=Nunhems
 nunhems: stow restic git keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
 	# The following packages should be available: $^
+	@if ! grep -q "export PROVISIONING_ENV=" $(HOME)/.bash_profile; then \
+		echo >> $(HOME)/.bash_profile ; \
+		echo "export PROVISIONING_ENV=$(PROVISIONING_ENV)" >> $(HOME)/.bash_profile ; \
+	fi
 
 # * Application installation & configuration
 
