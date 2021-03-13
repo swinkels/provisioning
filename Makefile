@@ -129,7 +129,7 @@ curl: ~/.local/bin/curl
 
 ~/.local/bin/curl: $(STOW_DIR)/$(CURL_ARCHIVE_DIR)/bin
 	# Install curl using Stow
-	stow $(CURL_ARCHIVE_DIR)
+	stow $(CURL_ARCHIVE_DIR) && touch $@
 
 $(STOW_DIR)/$(CURL_ARCHIVE_DIR)/bin: $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)/src/curl
 	# Install curl to Stow directory
