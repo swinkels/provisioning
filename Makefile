@@ -16,6 +16,8 @@ MAKEFILE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 PACKAGE_DIR=$(MAKEFILE_DIR)/packages
 
+WGET_OPTIONS=--timestamping --directory-prefix=$(PACKAGE_DIR)
+
 # * Default target
 
 .PHONY: default-target
@@ -52,7 +54,7 @@ $(PACKAGE_DIR)/$(RESTIC_PACKAGE): | $(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2
 
 $(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2:
 	# Download restic version $(RESTIC_VERSION) to the packages directory
-	wget --directory-prefix=$(PACKAGE_DIR) https://github.com/restic/restic/releases/download/v$(RESTIC_VERSION)/$(RESTIC_PACKAGE).bz2
+	wget $(WGET_OPTIONS) https://github.com/restic/restic/releases/download/v$(RESTIC_VERSION)/$(RESTIC_PACKAGE).bz2
 
 # ** git
 
@@ -74,7 +76,7 @@ $(PACKAGE_DIR)/git-$(GIT_VERSION): $(PACKAGE_DIR)/v$(GIT_VERSION).tar.gz
 	tar xvzf $< -C $(PACKAGE_DIR)
 
 $(PACKAGE_DIR)/v$(GIT_VERSION).tar.gz:
-	wget --directory-prefix=$(PACKAGE_DIR) https://github.com/git/git/archive/v$(GIT_VERSION).tar.gz
+	wget $(WGET_OPTIONS) https://github.com/git/git/archive/v$(GIT_VERSION).tar.gz
 
 # ** curl
 
@@ -104,7 +106,7 @@ $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR): $(PACKAGE_DIR)/$(CURL_ARCHIVE)
 
 $(PACKAGE_DIR)/$(CURL_ARCHIVE):
 	# Download curl source package to the packages directory
-	wget --timestamping --directory-prefix=$(PACKAGE_DIR) https://curl.se/download/$(CURL_ARCHIVE)
+	wget $(WGET_OPTIONS) https://curl.se/download/$(CURL_ARCHIVE)
 
 # ** keychain
 
@@ -132,7 +134,7 @@ $(PACKAGE_DIR)/$(KEYCHAIN_PACKAGE_DIR)/keychain: | $(PACKAGE_DIR)/$(KEYCHAIN_VER
 
 $(PACKAGE_DIR)/$(KEYCHAIN_VERSION).tar.gz:
 	# Download keychain version $(KEYCHAIN_VERSION) to the packages directory
-	cd $(PACKAGE_DIR) && wget https://github.com/funtoo/keychain/archive/$(KEYCHAIN_VERSION).tar.gz
+	wget $(WGET_OPTIONS) https://github.com/funtoo/keychain/archive/$(KEYCHAIN_VERSION).tar.gz
 
 # ** ripgrep
 
@@ -153,7 +155,7 @@ $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE)/rg: | $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.
 
 $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.gz:
 	# Download ripgrep version $(RIP_GREP_VERSION) to the packages directory
-	cd $(PACKAGE_DIR) && wget https://github.com/BurntSushi/ripgrep/releases/download/$(RIP_GREP_VERSION)/$(RIP_GREP_PACKAGE).tar.gz
+	wget $(WGET_OPTIONS) https://github.com/BurntSushi/ripgrep/releases/download/$(RIP_GREP_VERSION)/$(RIP_GREP_PACKAGE).tar.gz
 
 # ** stow
 
@@ -183,7 +185,7 @@ $(PACKAGE_DIR)/$(STOW_ARCHIVE_DIR): $(PACKAGE_DIR)/$(STOW_ARCHIVE)
 
 $(PACKAGE_DIR)/$(STOW_ARCHIVE):
 	# Download stow source package to the packages directory
-	wget --timestamping --directory-prefix=$(PACKAGE_DIR) https://ftp.gnu.org/gnu/stow/$(STOW_ARCHIVE)
+	wget $(WGET_OPTIONS) https://ftp.gnu.org/gnu/stow/$(STOW_ARCHIVE)
 
 # ** tmux
 
@@ -200,7 +202,7 @@ tmux: ~/.local/bin/tmux
 
 $(PACKAGE_DIR)/$(TMUX_APP_IMAGE): | $(PACKAGE_DIR)
 	# Download tmux version $(TMUX_VERSION) to the packages directory
-	cd $(PACKAGE_DIR) && wget https://github.com/tmux/tmux/releases/download/$(TMUX_VERSION)/$(TMUX_APP_IMAGE) && chmod 700 $(TMUX_APP_IMAGE)
+	wget $(WGET_OPTIONS) https://github.com/tmux/tmux/releases/download/$(TMUX_VERSION)/$(TMUX_APP_IMAGE) && chmod 700 $(TMUX_APP_IMAGE)
 
 $(PACKAGE_DIR):
 	# Create the directory to store packages
