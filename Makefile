@@ -3,7 +3,7 @@
 # * Main variables
 
 ifeq ($(STOW_DIR),)
-export STOW_DIR=~/.local/stow
+export STOW_DIR=$(HOME)/.local/stow
 endif
 
 LOCAL_FONTS_DIR=$(HOME)/.local/share/fonts
