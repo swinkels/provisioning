@@ -37,7 +37,7 @@ no-target:
 
 .PHONY: nunhems
 
-nunhems: stow restic git keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
+nunhems: stow git zsh restic keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
 	# The following packages should be available: $^
 	@if ! grep -q "export PROVISIONING_ENV=" $(HOME)/.bash_profile; then \
 		echo >> $(HOME)/.bash_profile ; \
@@ -258,6 +258,73 @@ $(PACKAGE_DIR):
 	# Create the directory to store packages
 	- mkdir -p $(PACKAGE_DIR)
 
+# ** zsh
+
+.PHONY: zsh oh-my-zsh
+
+ZSH_VERSION=5.8
+ZSH_ARCHIVE_DIR=zsh-$(ZSH_VERSION)
+ZSH_ARCHIVE=$(ZSH_ARCHIVE_DIR).tar.xz
+
+# The following variable contains the commands to start zsh from the bash
+# profile. This is a workaround if you cannot use ~chsh~ to set the shell
+# (https://unix.stackexchange.com/a/136424).
+#
+# How to define (and use) a multiline variable in a Makefile is from
+# https://stackoverflow.com/a/649462.
+define NEW_BASH_PREFIX
+export SHELL=~/.local/bin/zsh
+[ -z "$$ZSH_VERSION" ] && exec "$$SHELL" -l
+
+endef
+NEW_BASH_PROFILE=$(HOME)/.bash_profile.new
+
+export NEW_BASH_PREFIX
+zsh: zsh-install oh-my-zsh
+
+zsh-install: ~/.local/bin/zsh
+	@if ! grep -q "export SHELL=~/.local/bin/zsh" $(HOME)/.bash_profile; then \
+		echo "$$NEW_BASH_PREFIX" > $(NEW_BASH_PROFILE) ; \
+		cat $(HOME)/.bash_profile >> $(NEW_BASH_PROFILE) ; \
+		cp $(NEW_BASH_PROFILE) $(HOME)/.bash_profile ; \
+	fi
+	# zsh is installed
+
+~/.local/bin/zsh: $(STOW_DIR)/$(ZSH_ARCHIVE_DIR)/bin
+	# Install zsh using Stow
+	stow $(ZSH_ARCHIVE_DIR) && touch $@
+
+$(STOW_DIR)/$(ZSH_ARCHIVE_DIR)/bin: $(PACKAGE_DIR)/$(ZSH_ARCHIVE_DIR)/Src/zsh
+	# Install zsh to Stow directory
+	cd $(PACKAGE_DIR)/$(ZSH_ARCHIVE_DIR) && make install
+
+$(PACKAGE_DIR)/$(ZSH_ARCHIVE_DIR)/Src/zsh: | $(PACKAGE_DIR)/$(ZSH_ARCHIVE_DIR)
+	# Build zsh from source
+	cd $| && ./configure --prefix=$(STOW_DIR)/$(ZSH_ARCHIVE_DIR) && make
+
+$(PACKAGE_DIR)/$(ZSH_ARCHIVE_DIR): $(PACKAGE_DIR)/$(ZSH_ARCHIVE)
+	# Uncompress zsh source package
+	tar xJf $< -C $(PACKAGE_DIR)
+
+$(PACKAGE_DIR)/$(ZSH_ARCHIVE):
+	# Download zsh source package to the packages directory
+	wget $(WGET_OPTIONS) https://www.zsh.org/pub/$(ZSH_ARCHIVE)
+
+oh-my-zsh: $(HOME)/.oh-my-zsh
+	# oh-my-zsh is installed
+
+$(HOME)/.oh-my-zsh: ${PACKAGE_DIR}/oh-my-zsh/install.sh
+	# Install oh-my-zsh using its installation script
+	cd ${PACKAGE_DIR}/oh-my-zsh && CHSH=NO RUNZSH=NO ./install.sh
+
+${PACKAGE_DIR}/oh-my-zsh/install.sh: | ${PACKAGE_DIR}/oh-my-zsh
+	# Download oh-my-zsh installation script to the packages subdirectory
+	cd $| && wget --timestamping https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh && chmod 700 install.sh
+
+${PACKAGE_DIR}/oh-my-zsh:
+	# Create subdirectory for oh-my-zsh installation script
+	mkdir -p ${PACKAGE_DIR}/oh-my-zsh
+
 bootstrap:
 	# set the local time to CET
 	- sudo rm /etc/localtime
@@ -442,33 +509,6 @@ install-zsh-plugin-virtualenvwrapper: $(HOME)/.zshrc
 	if ! grep -q "$(WRAPPER_MARKER)" $<; then \
 		sed -i -r 's/(^plugins=\()(.*)$$/\1$(WRAPPER_MARKER) \2/' $(HOME)/.zshrc ; \
 	fi
-
-$(HOME)/.zshrc: $(HOME)/.zshrc.orig
-	cp $< $@
-
-$(HOME)/.zshrc.orig:
-	if [ -s $(HOME)/.zshrc ]; then \
-		cp $(HOME)/.zshrc $(HOME)/.zshrc.orig ; \
-	else \
-		touch $(HOME)/.zshrc.orig ; \
-	fi
-
-setup-zsh: install-zsh set-zsh-as-login-shell | $(HOME)/.oh-my-zsh
-
-install-zsh:
-	sudo apt-get install -y zsh
-
-set-zsh-as-login-shell:
-	@echo Set login shell of the current user to zsh. This requires you to enter
-	@echo your password and a logout \& login.
-	chsh -s $(shell which zsh)
-
-$(HOME)/.oh-my-zsh: $(HOME)/tmp/install-oh-my-zsh.sh
-	sh $<
-
-$(HOME)/tmp/install-oh-my-zsh.sh: | $(HOME)/tmp
-	curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh > $@
-	sed -i '/^.*env zsh -l/d' $@
 
 CAPS_TO_CTRL_COMMAND="setxkbmap -option compose:rctrl -option ctrl:nocaps"
 
