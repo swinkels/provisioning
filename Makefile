@@ -272,21 +272,21 @@ ZSH_ARCHIVE=$(ZSH_ARCHIVE_DIR).tar.xz
 #
 # How to define (and use) a multiline variable in a Makefile is from
 # https://stackoverflow.com/a/649462.
-define NEW_BASH_PREFIX
+define EXEC_LOCAL_ZSH
 export SHELL=~/.local/bin/zsh
 [ -z "$$ZSH_VERSION" ] && exec "$$SHELL" -l
 
 endef
-NEW_BASH_PROFILE=$(HOME)/.bash_profile.new
+BASH_PROFILE=$(HOME)/.bash_profile
 
-export NEW_BASH_PREFIX
+export EXEC_LOCAL_ZSH
 zsh: zsh-install oh-my-zsh
 
+# How to prefix an existing file is from
+# https://www.cyberciti.biz/faq/bash-prepend-text-lines-to-file/.
 zsh-install: ~/.local/bin/zsh
-	@if ! grep -q "export SHELL=~/.local/bin/zsh" $(HOME)/.bash_profile; then \
-		echo "$$NEW_BASH_PREFIX" > $(NEW_BASH_PROFILE) ; \
-		cat $(HOME)/.bash_profile >> $(NEW_BASH_PROFILE) ; \
-		cp $(NEW_BASH_PROFILE) $(HOME)/.bash_profile ; \
+	@if ! grep -q "export SHELL=~/.local/bin/zsh" $(BASH_PROFILE) ; then \
+		echo -e "$$EXEC_LOCAL_ZSH\n`cat $(BASH_PROFILE)`" > $(BASH_PROFILE) ; \
 	fi
 	# zsh is installed
 
