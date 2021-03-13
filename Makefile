@@ -56,6 +56,45 @@ $(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2:
 	# Download restic version $(RESTIC_VERSION) to the packages directory
 	wget $(WGET_OPTIONS) https://github.com/restic/restic/releases/download/v$(RESTIC_VERSION)/$(RESTIC_PACKAGE).bz2
 
+# ** emacs
+
+EMACS_VERSION=27.1
+EMACS_ARCHIVE_DIR=emacs-$(EMACS_VERSION)
+EMACS_ARCHIVE=$(EMACS_ARCHIVE_DIR).tar.gz
+
+ifeq ($(PROVISIONING_ENV), Nunhems)
+EMACS_EXTRA_CONFIGURE_OPTIONS= \
+  --with-gif=ifavailable \
+  --with-gnutls=ifavailable \
+  --with-jpeg=ifavailable \
+  --with-png=ifavailable \
+  --with-tiff=ifavailable \
+  --with-x-toolkit=no \
+  --with-xpm=ifavailable
+endif
+
+emacs: ~/.local/bin/emacs
+
+~/.local/bin/emacs: $(STOW_DIR)/emacs
+	# Install emacs using stow (dry-run only)
+	# stow --simulate emacs
+
+$(STOW_DIR)/emacs: $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)/bin/emacs
+	# Install emacs to stow directory
+	cd $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR) && make install
+
+$(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)/bin/emacs: $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)
+	# Build emacs from source
+	cd $< && ./configure $(EMACS_EXTRA_CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/emacs && make
+
+$(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR): $(PACKAGE_DIR)/$(EMACS_ARCHIVE)
+	# Uncompress emacs source package
+	tar xvzf $< -C $(PACKAGE_DIR)
+
+$(PACKAGE_DIR)/$(EMACS_ARCHIVE):
+	# Download emacs source package to the packages directory
+	wget $(WGET_OPTIONS) http://ftp.snt.utwente.nl/pub/software/gnu/emacs/$(EMACS_ARCHIVE)
+
 # ** git
 
 .PHONY: git
@@ -235,28 +274,6 @@ depends: install-emacs-dependencies
 fix-sources-list:
 	sudo sed -i -r 's/^# (deb-src http.* bionic main restricted.*)/\1/' /etc/apt/sources.list
 	sudo apt-get update
-
-EMACS_VERSION=26.3
-EMACS_NAME=emacs-$(EMACS_VERSION)
-EMACS_ARCHIVE=$(EMACS_NAME).tar.gz
-
-emacs: install-emacs-build-dependencies $(HOME)/.local/bin/$(EMACS_NAME)
-
-install-emacs-build-dependencies:
-	sudo apt-get -y install autoconf automake libtool texinfo build-essential xorg-dev libgtk2.0-dev libjpeg-dev libncurses5-dev libdbus-1-dev libgif-dev libtiff-dev libm17n-dev libpng-dev librsvg2-dev libotf-dev libgnutls28-dev libxml2-dev
-
-$(HOME)/.local/bin/$(EMACS_NAME): $(HOME)/external_software/$(EMACS_NAME) | $(HOME)/.local
-	cd $< && ./configure --prefix=$(HOME)/.local && make && make install
-
-$(HOME)/external_software/$(EMACS_NAME): $(HOME)/tmp/$(EMACS_ARCHIVE) | $(HOME)/external_software
-	tar xvf $< -C $(HOME)/external_software
-
-$(HOME)/tmp/$(EMACS_ARCHIVE): | $(HOME)/tmp
-	cd $(HOME)/tmp && wget --timestamping http://ftp.snt.utwente.nl/pub/software/gnu/emacs/$(EMACS_ARCHIVE)
-
-emacs-clean:
-	- cd $(HOME)/external_software/$(EMACS_NAME) && make uninstall
-	- rm -rf $(HOME)/external_software/$(EMACS_NAME)
 
 spacemacs: install-spacemacs-dependencies $(HOME)/.emacs.d
 
