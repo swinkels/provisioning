@@ -75,24 +75,24 @@ endif
 
 emacs: ~/.local/bin/emacs
 
-~/.local/bin/emacs: $(STOW_DIR)/emacs
-	# Install emacs using stow (dry-run only)
-	# stow --simulate emacs
+~/.local/bin/emacs: $(STOW_DIR)/$(EMACS_ARCHIVE_DIR)/bin
+	# Install Emacs using Stow (dry-run only)
+	# stow --simulate $(EMACS_ARCHIVE_DIR)
 
-$(STOW_DIR)/emacs: $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)/bin/emacs
-	# Install emacs to stow directory
+$(STOW_DIR)/$(EMACS_ARCHIVE_DIR)/bin: $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)/src/emacs
+	# Install Emacs to Stow directory
 	cd $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR) && make install
 
-$(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)/bin/emacs: $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)
-	# Build emacs from source
-	cd $< && ./configure $(EMACS_EXTRA_CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/emacs && make
+$(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)/src/emacs: | $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)
+	# Build Emacs from source
+	cd $| && ./configure $(EMACS_EXTRA_CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(EMACS_ARCHIVE_DIR) && make
 
 $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR): $(PACKAGE_DIR)/$(EMACS_ARCHIVE)
-	# Uncompress emacs source package
-	tar xvzf $< -C $(PACKAGE_DIR)
+	# Uncompress Emacs source package
+	tar xzf $< -C $(PACKAGE_DIR)
 
 $(PACKAGE_DIR)/$(EMACS_ARCHIVE):
-	# Download emacs source package to the packages directory
+	# Download Emacs source package to the packages directory
 	wget $(WGET_OPTIONS) http://ftp.snt.utwente.nl/pub/software/gnu/emacs/$(EMACS_ARCHIVE)
 
 # ** git
@@ -137,7 +137,7 @@ $(STOW_DIR)/curl: $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)/bin/curl
 
 $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)/bin/curl: $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)
 	# Build curl from source
-	cd $< && ./configure --prefix=$(STOW_DIR)/curl && make
+	cd $< && ./configure --prefix=$(STOW_DIR)/curl-$(CURL_VERSION) && make
 
 $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR): $(PACKAGE_DIR)/$(CURL_ARCHIVE)
 	# Uncompress curl source package
