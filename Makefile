@@ -127,21 +127,21 @@ CURL_ARCHIVE=$(CURL_ARCHIVE_DIR).tar.gz
 
 curl: ~/.local/bin/curl
 
-~/.local/bin/curl: $(STOW_DIR)/curl
-	# Install curl using stow
-	stow curl
+~/.local/bin/curl: $(STOW_DIR)/$(CURL_ARCHIVE_DIR)/bin
+	# Install curl using Stow
+	stow $(CURL_ARCHIVE_DIR)
 
-$(STOW_DIR)/curl: $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)/bin/curl
-	# Install curl to stow directory
+$(STOW_DIR)/$(CURL_ARCHIVE_DIR)/bin: $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)/src/curl
+	# Install curl to Stow directory
 	cd $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR) && make install
 
-$(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)/bin/curl: $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)
+$(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)/src/curl: | $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)
 	# Build curl from source
-	cd $< && ./configure --prefix=$(STOW_DIR)/curl-$(CURL_VERSION) && make
+	cd $| && ./configure --prefix=$(STOW_DIR)/$(CURL_ARCHIVE_DIR) && make
 
 $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR): $(PACKAGE_DIR)/$(CURL_ARCHIVE)
 	# Uncompress curl source package
-	tar xvzf $< -C $(PACKAGE_DIR)
+	tar xzf $< -C $(PACKAGE_DIR)
 
 $(PACKAGE_DIR)/$(CURL_ARCHIVE):
 	# Download curl source package to the packages directory
