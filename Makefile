@@ -48,10 +48,6 @@ no-target:
 
 nunhems: stow git zsh restic keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
 	# The following packages should be available: $^
-	@if ! grep -q "export PROVISIONING_ENV=" $(HOME)/.bash_profile; then \
-		echo >> $(HOME)/.bash_profile ; \
-		echo "export PROVISIONING_ENV=$(PROVISIONING_ENV)" >> $(HOME)/.bash_profile ; \
-	fi
 
 # * Application installation & configuration
 
@@ -181,11 +177,6 @@ keychain: ~/.local/bin/keychain
 ~/.local/bin/keychain: $(PACKAGE_DIR)/$(KEYCHAIN_PACKAGE_DIR)/keychain
 	# Link the ripgrep binary to a directory in PATH
 	ln -s $< $@
-	# Let bash profile evaluate keychain
-	@if ! grep -q $(EVAL_KEYCHAIN_COMMAND) $(HOME)/.bash_profile; then \
-		echo >> $(HOME)/.bash_profile ; \
-		echo "$(EVAL_KEYCHAIN_COMMAND)" >> $(HOME)/.bash_profile ; \
-	fi
 
 $(PACKAGE_DIR)/$(KEYCHAIN_PACKAGE_DIR)/keychain: | $(PACKAGE_DIR)/$(KEYCHAIN_VERSION).tar.gz
 	# Uncompress keychain archive
@@ -225,10 +216,6 @@ STOW_ARCHIVE_DIR=stow-$(STOW_VERSION)
 STOW_ARCHIVE=$(STOW_ARCHIVE_DIR).tar.gz
 
 stow: ~/.local/bin/stow
-	@if ! grep -q "export STOW_DIR=" $(HOME)/.bash_profile; then \
-		echo >> $(HOME)/.bash_profile ; \
-		echo "export STOW_DIR=$(STOW_DIR)" >> $(HOME)/.bash_profile ; \
-	fi
 
 ~/.local/bin/stow: $(PACKAGE_DIR)/$(STOW_ARCHIVE_DIR)/bin/stow
 	# Install stow
