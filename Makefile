@@ -20,6 +20,15 @@ WGET_OPTIONS=--timestamping --directory-prefix=$(PACKAGE_DIR)
 
 # * Default target
 
+# If you don't specify a target on the command-line, this Makefile falls back to
+# target ~default-target~. That target only leads to the target that is determined
+# by the value of environment variable ~PROVISIONING_ENV~, see the code below for
+# the actual mapping from value to target.
+
+# If the environment variable is undefined or specifies a provisioning environment
+# that is not recognized, the actual target is ~no-target~. That target lets
+# ~make~ abort with the error message to specify an explicit target.
+
 .PHONY: default-target no-target
 
 ifeq ($(PROVISIONING_ENV), Nunhems)
