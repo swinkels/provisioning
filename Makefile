@@ -46,7 +46,13 @@ no-target:
 
 .PHONY: nunhems
 
-nunhems: stow git zsh restic keychain ripgrep tmux yadm $(HOME)/.emacs.d spacemacs-config
+# Some targets have to run before others. Currently (target) ~stow~ runs first
+# as stow is used to install most of the other packages. ~git~ runs second as
+# git is used to retrieve the software for other targets. ~yadm~ runs third as
+# yadm provides configurations for other software: with those configurations
+# already in place, that software can start fully configured.
+
+nunhems: stow git yadm keychain zsh restic ripgrep tmux $(HOME)/.emacs.d spacemacs-config
 	# The following packages should be available: $^
 
 # * Application installation & configuration
