@@ -57,27 +57,6 @@ nunhems: stow git yadm keychain zsh restic ripgrep tmux $(HOME)/.emacs.d spacema
 
 # * Application installation & configuration
 
-# ** restic
-
-.PHONY: restic
-
-RESTIC_VERSION=0.12.0
-RESTIC_PACKAGE=restic_$(RESTIC_VERSION)_linux_amd64
-
-restic: ~/.local/bin/restic
-
-~/.local/bin/restic: $(PACKAGE_DIR)/$(RESTIC_PACKAGE)
-	# Link the restic binary to a directory in PATH
-	ln -s $< $@
-
-$(PACKAGE_DIR)/$(RESTIC_PACKAGE): | $(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2
-	# Uncompress restic archive
-	cd $(PACKAGE_DIR) && bzip2 --decompress $(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2 && chmod 700 $(RESTIC_PACKAGE)
-
-$(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2:
-	# Download restic version $(RESTIC_VERSION) to the packages directory
-	wget $(WGET_OPTIONS) https://github.com/restic/restic/releases/download/v$(RESTIC_VERSION)/$(RESTIC_PACKAGE).bz2
-
 # ** emacs
 
 EMACS_VERSION=27.1
@@ -97,11 +76,11 @@ endif
 
 emacs: ~/.local/bin/emacs
 
-~/.local/bin/emacs: $(STOW_DIR)/$(EMACS_ARCHIVE_DIR)/bin
-	# Install Emacs using Stow (dry-run only)
-	# stow --simulate $(EMACS_ARCHIVE_DIR)
+~/.local/bin/emacs: $(STOW_DIR)/$(EMACS_ARCHIVE_DIR)/bin/emacs
+	# Install Emacs using Stow
+	stow $(EMACS_ARCHIVE_DIR) && touch $@
 
-$(STOW_DIR)/$(EMACS_ARCHIVE_DIR)/bin: $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)/src/emacs
+$(STOW_DIR)/$(EMACS_ARCHIVE_DIR)/bin/emacs: $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)/src/emacs
 	# Install Emacs to Stow directory
 	cd $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR) && make install
 
@@ -138,6 +117,36 @@ $(PACKAGE_DIR)/git-$(GIT_VERSION): $(PACKAGE_DIR)/v$(GIT_VERSION).tar.gz
 
 $(PACKAGE_DIR)/v$(GIT_VERSION).tar.gz:
 	wget $(WGET_OPTIONS) https://github.com/git/git/archive/v$(GIT_VERSION).tar.gz
+
+# ** cmake
+
+.PHONY: cmake
+
+CMAKE_VERSION=3.20.0
+CMAKE_ARCHIVE_DIR=cmake-$(CMAKE_VERSION)
+CMAKE_ARCHIVE=$(CMAKE_ARCHIVE_DIR).tar.gz
+
+cmake: ~/.local/bin/cmake
+
+~/.local/bin/cmake: $(STOW_DIR)/$(CMAKE_ARCHIVE_DIR)/bin/cmake
+	# Install cmake using Stow
+	stow $(CMAKE_ARCHIVE_DIR) && touch $@
+
+$(STOW_DIR)/$(CMAKE_ARCHIVE_DIR)/bin/cmake: $(PACKAGE_DIR)/$(CMAKE_ARCHIVE_DIR)/bin/cmake
+	# Install cmake to Stow directory
+	cd $(PACKAGE_DIR)/$(CMAKE_ARCHIVE_DIR) && make install
+
+$(PACKAGE_DIR)/$(CMAKE_ARCHIVE_DIR)/bin/cmake: | $(PACKAGE_DIR)/$(CMAKE_ARCHIVE_DIR)
+	# Build cmake from source
+	cd $| && ./configure --prefix=$(STOW_DIR)/$(CMAKE_ARCHIVE_DIR) && make
+
+$(PACKAGE_DIR)/$(CMAKE_ARCHIVE_DIR): $(PACKAGE_DIR)/$(CMAKE_ARCHIVE)
+	# Uncompress cmake source package
+	tar xzf $< -C $(PACKAGE_DIR)
+
+$(PACKAGE_DIR)/$(CMAKE_ARCHIVE):
+	# Download cmake source package to the packages directory
+	wget $(WGET_OPTIONS) https://github.com/Kitware/CMake/releases/download/v$(CMAKE_VERSION)/$(CMAKE_ARCHIVE)
 
 # ** curl
 
@@ -191,6 +200,57 @@ $(PACKAGE_DIR)/$(KEYCHAIN_PACKAGE_DIR)/keychain: | $(PACKAGE_DIR)/$(KEYCHAIN_VER
 $(PACKAGE_DIR)/$(KEYCHAIN_VERSION).tar.gz:
 	# Download keychain version $(KEYCHAIN_VERSION) to the packages directory
 	wget $(WGET_OPTIONS) https://github.com/funtoo/keychain/archive/$(KEYCHAIN_VERSION).tar.gz
+
+# ** libtool
+
+.PHONY: libtool
+
+LIBTOOL_VERSION=2.4.6
+LIBTOOL_ARCHIVE_DIR=libtool-$(LIBTOOL_VERSION)
+LIBTOOL_ARCHIVE=$(LIBTOOL_ARCHIVE_DIR).tar.gz
+
+libtool: ~/.local/bin/libtool
+
+~/.local/bin/libtool: $(STOW_DIR)/$(LIBTOOL_ARCHIVE_DIR)/bin/libtool
+	# Install libtool using Stow
+	stow $(LIBTOOL_ARCHIVE_DIR) && touch $@
+
+$(STOW_DIR)/$(LIBTOOL_ARCHIVE_DIR)/bin/libtool: $(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE_DIR)/libtool
+	# Install libtool to Stow directory
+	cd $(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE_DIR) && make install
+
+$(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE_DIR)/libtool: | $(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE_DIR)
+	# Build libtool from source
+	cd $| && ./configure --prefix=$(STOW_DIR)/$(LIBTOOL_ARCHIVE_DIR) && make
+
+$(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE_DIR): $(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE)
+	# Uncompress libtool source package
+	tar xzf $< -C $(PACKAGE_DIR)
+
+$(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE):
+	# Download libtool source package to the packages directory
+	wget $(WGET_OPTIONS) http://ftp.jaist.ac.jp/pub/GNU/libtool/$(LIBTOOL_ARCHIVE)
+
+# ** restic
+
+.PHONY: restic
+
+RESTIC_VERSION=0.12.0
+RESTIC_PACKAGE=restic_$(RESTIC_VERSION)_linux_amd64
+
+restic: ~/.local/bin/restic
+
+~/.local/bin/restic: $(PACKAGE_DIR)/$(RESTIC_PACKAGE)
+	# Link the restic binary to a directory in PATH
+	ln -s $< $@
+
+$(PACKAGE_DIR)/$(RESTIC_PACKAGE): | $(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2
+	# Uncompress restic archive
+	cd $(PACKAGE_DIR) && bzip2 --decompress $(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2 && chmod 700 $(RESTIC_PACKAGE)
+
+$(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2:
+	# Download restic version $(RESTIC_VERSION) to the packages directory
+	wget $(WGET_OPTIONS) https://github.com/restic/restic/releases/download/v$(RESTIC_VERSION)/$(RESTIC_PACKAGE).bz2
 
 # ** ripgrep
 
@@ -271,7 +331,7 @@ ZSH_ARCHIVE=$(ZSH_ARCHIVE_DIR).tar.xz
 # The following variable contains the commands to start zsh from the bash
 # profile. This is a workaround if you cannot use ~chsh~ to set the shell
 # (https://unix.stackexchange.com/a/136424).
-#
+
 # How to define (and use) a multiline variable in a Makefile is from
 # https://stackoverflow.com/a/649462.
 define EXEC_LOCAL_ZSH
@@ -355,7 +415,10 @@ fix-sources-list:
 	sudo sed -i -r 's/^# (deb-src http.* bionic main restricted.*)/\1/' /etc/apt/sources.list
 	sudo apt-get update
 
-spacemacs: install-spacemacs-dependencies $(HOME)/.emacs.d
+# spacemacs uses emacs-libterm, which needs cmake and libtool to build some of its
+# dependencies during installation.
+
+spacemacs: cmake libtool install-spacemacs-dependencies $(HOME)/.emacs.d
 
 install-spacemacs-dependencies:
 	sudo apt-get install -y fonts-powerline
