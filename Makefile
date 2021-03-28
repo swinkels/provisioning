@@ -548,33 +548,6 @@ endif
 $(RESTIC_BACKUP_REPO):
 	$(error Unable to create backup: there is no restic backup repository at $@)
 
-python-dev: | $(HOME)/.local $(HOME)/tmp
-	curl -fsSL https://bootstrap.pypa.io/get-pip.py > $(HOME)/tmp/get-pip.py
-	python3 $(HOME)/tmp/get-pip.py --user
-	$(HOME)/.local/bin/pip install --user --upgrade virtualenvwrapper
-
-SOURCE_WRAPPER_MARKER=\$$HOME/.local/bin/virtualenvwrapper.sh
-SOURCE_WRAPPER_LINES=source $(SOURCE_WRAPPER_MARKER)
-
-install-virtualenvwrapper-in-zsh: $(HOME)/.zshrc $(HOME)/.virtualenvs
-	if ! grep -q "$(SOURCE_WRAPPER_MARKER)" $<; then \
-		echo >> $< ; \
-		echo "# added by the provisioning script" >> $< ; \
-		echo "export WORKON_HOME=\$$HOME/.virtualenvs" >> $< ; \
-		echo "export VIRTUALENVWRAPPER_PYTHON=`which python3`" >> $< ; \
-		echo "$(SOURCE_WRAPPER_LINES)" >> $< ; \
-	fi
-
-$(HOME)/.virtualenvs:
-	mkdir $@
-
-WRAPPER_MARKER=virtualenvwrapper
-
-install-zsh-plugin-virtualenvwrapper: $(HOME)/.zshrc
-	if ! grep -q "$(WRAPPER_MARKER)" $<; then \
-		sed -i -r 's/(^plugins=\()(.*)$$/\1$(WRAPPER_MARKER) \2/' $(HOME)/.zshrc ; \
-	fi
-
 CAPS_TO_CTRL_COMMAND="setxkbmap -option compose:rctrl -option ctrl:nocaps"
 
 set-caps-to-ctrl: $(HOME)/.xprofile
