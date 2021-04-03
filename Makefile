@@ -52,7 +52,7 @@ no-target:
 # yadm provides configurations for other software: with those configurations
 # already in place, that software can start fully configured.
 
-nunhems: stow git yadm keychain zsh restic ripgrep tmux $(HOME)/.emacs.d spacemacs-config
+nunhems: stow git yadm keychain zsh fzf restic ripgrep tmux $(HOME)/.emacs.d spacemacs-config
 	# The following packages should be available: $^
 
 # * Application installation & configuration
@@ -177,6 +177,26 @@ $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR): $(PACKAGE_DIR)/$(CURL_ARCHIVE)
 $(PACKAGE_DIR)/$(CURL_ARCHIVE):
 	# Download curl source package to the packages directory
 	wget $(WGET_OPTIONS) https://curl.se/download/$(CURL_ARCHIVE)
+
+# ** fzf
+
+.PHONY: fzf
+
+# We let the main target depend on the ~fzf.tmux~ script instead of the ~fzf~
+# binary. Because the binary has its build date as its creation date, it will
+# always be older than the files it depends on. So would we use the ~fzf~ binary
+# as a target, it would always be rebuild. The script doesn't have this issue as
+# its created at installation.
+
+fzf: ~/.fzf/bin/fzf-tmux
+
+~/.fzf/bin/fzf-tmux: | ~/.fzf/install
+	# Install fzf using its install script
+	cd ~/.fzf && ./install --key-bindings --completion --no-bash --no-update-rc
+
+~/.fzf/install:
+	# Clone fzf to its installation directory
+	git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 
 # ** keychain
 
