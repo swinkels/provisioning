@@ -437,7 +437,7 @@ spacemacs-clean:
 	rm -rf $(LOCAL_GITHUB_REPOS_DIR)/spacemacs
 	rm $(HOME)/.emacs.d
 
-spacemacs-config: $(HOME)/.spacemacs $(HOME)/.emacs.d/private/spacemacs-config $(HOME)/.emacs.d/private/journal $(LOCAL_GITHUB_REPOS_DIR)/oje
+spacemacs-config: $(HOME)/.spacemacs $(HOME)/.emacs.d/private/spacemacs-config $(HOME)/.emacs.d/private/journal
 
 $(HOME)/.spacemacs: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config/.spacemacs
 	ln -s $< $@
@@ -458,9 +458,6 @@ $(HOME)/.emacs.d/private/journal: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-journal
 
 $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-journal: | $(LOCAL_GITHUB_REPOS_DIR)
 	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/borgnix/spacemacs-journal.git
-
-$(LOCAL_GITHUB_REPOS_DIR)/oje: | $(LOCAL_GITHUB_REPOS_DIR)
-	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/swinkels/oje.git
 
 fonts: $(LOCAL_FONTS_DIR)/source-code-pro
 
