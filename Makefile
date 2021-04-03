@@ -657,3 +657,18 @@ install-vagrant: $(HOME)/tmp/vagrant_2.2.2_x86_64.deb
 
 $(HOME)/tmp/vagrant_2.2.2_x86_64.deb:
 	wget -P $(HOME)/tmp https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.deb
+
+# * Spacemacs installation tarball
+
+.PHONY: create-spacemacs-installation-tarball
+
+HOST_SPEC=$(shell hostname)
+EMACS_SPEC=emacs-$(shell emacs --version | head -n 1 | grep --only-matching "[[:digit:]]\+[.][^ ]\+")
+SPACEMACS_REPO_SPEC=spacemacs-$(shell ./repo-spec.sh $(LOCAL_GITHUB_REPOS_DIR)/spacemacs)
+SPACEMACS_CONFIG_REPO_SPEC=spacemacs-config-$(shell ./repo-spec.sh $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config)
+TIMESTAMP=$(shell date +"%Y%m%d-%H%M%S")
+
+SPACEMACS_INSTALL_ARCHIVE=$(HOST_SPEC)-$(EMACS_SPEC)-$(SPACEMACS_REPO_SPEC)-$(SPACEMACS_CONFIG_REPO_SPEC)-$(TIMESTAMP).tgz
+
+create-spacemacs-installation-tarball:
+	tar cvzf $(PACKAGE_DIR)/$(SPACEMACS_INSTALL_ARCHIVE) -C $(LOCAL_GITHUB_REPOS_DIR) spacemacs/ spacemacs-config/
