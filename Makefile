@@ -293,6 +293,35 @@ $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.gz:
 	# Download ripgrep version $(RIP_GREP_VERSION) to the packages directory
 	wget $(WGET_OPTIONS) https://github.com/BurntSushi/ripgrep/releases/download/$(RIP_GREP_VERSION)/$(RIP_GREP_PACKAGE).tar.gz
 
+# ** spacemacs
+
+.PHONY: spacemacs
+
+SPACEMACS_COMMIT=679040f
+SPACEMACS_STOW_DIR=$(GIT_REPOS_DIR)/spacemacs-production
+
+# spacemacs uses emacs-libterm, which needs cmake and libtool to build some of its
+# dependencies during installation.
+
+spacemacs: cmake libtool install-spacemacs-dependencies $(HOME)/.emacs.d
+
+$(HOME)/.emacs.d: | $(GIT_REPOS_DIR)/spacemacs-production/.emacs.d $(GIT_REPOS_DIR)/spacemacs-production/.spacemacs.d
+	# Install spacemacs using Stow
+	stow --dir=$(GIT_REPOS_DIR) --target=$(HOME) spacemacs-production
+
+$(SPACEMACS_STOW_DIR)/.emacs.d:
+	# Clone spacemacs to its Stow directory
+	git clone https://github.com/syl20bnr/spacemacs $@
+	# Checkout the develop branch at the correct commit
+	cd $@ && git reset --hard $(SPACEMACS_COMMIT)
+
+$(SPACEMACS_STOW_DIR)/.spacemacs.d:
+	# Clone my spacemacs config to its Stow directory
+	git clone git@github.com:swinkels/spacemacs-config.git $@
+
+install-spacemacs-dependencies:
+	# sudo apt-get install -y fonts-powerline
+
 # ** stow
 
 .PHONY: stow
@@ -407,6 +436,8 @@ ${PACKAGE_DIR}/oh-my-zsh:
 	# Create subdirectory for oh-my-zsh installation script
 	mkdir -p ${PACKAGE_DIR}/oh-my-zsh
 
+# * Miscellaneous
+
 bootstrap:
 	# set the local time to CET
 	- sudo rm /etc/localtime
@@ -435,49 +466,6 @@ fix-sources-list:
 	sudo sed -i -r 's/^# (deb-src http.* bionic main restricted.*)/\1/' /etc/apt/sources.list
 	sudo apt-get update
 
-# spacemacs uses emacs-libterm, which needs cmake and libtool to build some of its
-# dependencies during installation.
-
-spacemacs: cmake libtool install-spacemacs-dependencies $(HOME)/.emacs.d
-
-install-spacemacs-dependencies:
-	sudo apt-get install -y fonts-powerline
-
-$(HOME)/.emacs.d: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs
-	ln -s $< $@
-
-$(LOCAL_GITHUB_REPOS_DIR)/spacemacs: | $(LOCAL_GITHUB_REPOS_DIR)
-	# Uncompress existing spacemacs installation
-	tar xvzf $(PACKAGE_DIR)/spacemacs.tgz -C $(LOCAL_GITHUB_REPOS_DIR)
-	# Remove existing links to private packages
-	rm $@/private/journal
-	rm $@/private/spacemacs-config
-
-spacemacs-clean:
-	rm -rf $(LOCAL_GITHUB_REPOS_DIR)/spacemacs
-	rm $(HOME)/.emacs.d
-
-spacemacs-config: $(HOME)/.spacemacs $(HOME)/.emacs.d/private/spacemacs-config $(HOME)/.emacs.d/private/journal
-
-$(HOME)/.spacemacs: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config/.spacemacs
-	ln -s $< $@
-
-$(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config/.spacemacs: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config
-
-$(HOME)/.emacs.d/private/spacemacs-config: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config
-	ln -s $< $@
-
-$(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config: | $(LOCAL_GITHUB_REPOS_DIR)
-	# Clone my spacemacs config to the packages directory
-	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/swinkels/spacemacs-config.git
-	# Checkout the commit that matches the spacemacs installation
-	cd $@ && git checkout 9cc0d00
-
-$(HOME)/.emacs.d/private/journal: $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-journal
-	ln -s $< $@
-
-$(LOCAL_GITHUB_REPOS_DIR)/spacemacs-journal: | $(LOCAL_GITHUB_REPOS_DIR)
-	cd $(LOCAL_GITHUB_REPOS_DIR) && git clone https://github.com/borgnix/spacemacs-journal.git
 
 fonts: $(LOCAL_FONTS_DIR)/source-code-pro
 
