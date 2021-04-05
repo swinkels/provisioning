@@ -295,7 +295,7 @@ $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.gz:
 
 # ** spacemacs
 
-.PHONY: spacemacs
+.PHONY: spacemacs spacemacs-unstow
 
 SPACEMACS_COMMIT=679040f
 SPACEMACS_STOW_DIR=$(GIT_REPOS_DIR)/spacemacs-production
@@ -325,6 +325,30 @@ $(SPACEMACS_STOW_DIR)/.spacemacs.d:
 
 install-spacemacs-dependencies:
 	# sudo apt-get install -y fonts-powerline
+
+# Target ~spacemacs-create-tarball~ creates a tarball from the Spacemacs
+# directories at ~$(GIT_REPOS_DIR)/spacemacs-production~. The primary reason to
+# create this target was to be able to transfer a working Spacemacs installation
+# to a machine that could not access elpa (and therefore could not download the
+# required Emacs packages).
+#
+# As a bonus, the tarball allows you to install a working installation on any
+# machine in a known-good state. With a fresh installation that downloads the
+# latest versions of its dependent packages there's a change things don't work
+# as expected.
+
+.PHONY: spacemacs-create-tarball
+
+HOST_SPEC=$(shell hostname)
+EMACS_SPEC=emacs-$(shell emacs --version | head -n 1 | grep --only-matching "[[:digit:]]\+[.][^ ]\+")
+SPACEMACS_REPO_SPEC=spacemacs-$(shell ./repo-spec.sh $(SPACEMACS_STOW_DIR)/.emacs.d)
+SPACEMACS_CONFIG_REPO_SPEC=spacemacs-config-$(shell ./repo-spec.sh $(SPACEMACS_STOW_DIR)/.spacemacs.d)
+TIMESTAMP=$(shell date +"%Y%m%d-%H%M%S")
+
+SPACEMACS_INSTALL_ARCHIVE=$(HOST_SPEC)-$(EMACS_SPEC)-$(SPACEMACS_REPO_SPEC)-$(SPACEMACS_CONFIG_REPO_SPEC)-$(TIMESTAMP).tgz
+
+spacemacs-create-tarball:
+	tar cvzf $(PACKAGE_DIR)/$(SPACEMACS_INSTALL_ARCHIVE) -C $(GIT_REPOS_DIR) spacemacs-production
 
 # ** stow
 
@@ -669,18 +693,3 @@ install-vagrant: $(HOME)/tmp/vagrant_2.2.2_x86_64.deb
 
 $(HOME)/tmp/vagrant_2.2.2_x86_64.deb:
 	wget -P $(HOME)/tmp https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.deb
-
-# * Spacemacs installation tarball
-
-.PHONY: create-spacemacs-installation-tarball
-
-HOST_SPEC=$(shell hostname)
-EMACS_SPEC=emacs-$(shell emacs --version | head -n 1 | grep --only-matching "[[:digit:]]\+[.][^ ]\+")
-SPACEMACS_REPO_SPEC=spacemacs-$(shell ./repo-spec.sh $(LOCAL_GITHUB_REPOS_DIR)/spacemacs)
-SPACEMACS_CONFIG_REPO_SPEC=spacemacs-config-$(shell ./repo-spec.sh $(LOCAL_GITHUB_REPOS_DIR)/spacemacs-config)
-TIMESTAMP=$(shell date +"%Y%m%d-%H%M%S")
-
-SPACEMACS_INSTALL_ARCHIVE=$(HOST_SPEC)-$(EMACS_SPEC)-$(SPACEMACS_REPO_SPEC)-$(SPACEMACS_CONFIG_REPO_SPEC)-$(TIMESTAMP).tgz
-
-create-spacemacs-installation-tarball:
-	tar cvzf $(PACKAGE_DIR)/$(SPACEMACS_INSTALL_ARCHIVE) -C $(LOCAL_GITHUB_REPOS_DIR) spacemacs/ spacemacs-config/
