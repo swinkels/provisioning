@@ -309,6 +309,10 @@ $(HOME)/.emacs.d: | $(GIT_REPOS_DIR)/spacemacs-production/.emacs.d $(GIT_REPOS_D
 	# Install spacemacs using Stow
 	stow --dir=$(GIT_REPOS_DIR) --target=$(HOME) spacemacs-production
 
+spacemacs-unstow:
+	# Uninstall spacemacs using Stow
+	stow --delete --dir=$(GIT_REPOS_DIR) --target=$(HOME) spacemacs-production
+
 $(SPACEMACS_STOW_DIR)/.emacs.d:
 	# Clone spacemacs to its Stow directory
 	git clone https://github.com/syl20bnr/spacemacs $@
