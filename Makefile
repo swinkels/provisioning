@@ -295,6 +295,16 @@ $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.gz:
 
 # ** spacemacs
 
+# Target ~spacemacs~ clones spacemacs and my spacemacs configuration to a custom
+# stow directory - ~SPACEMACS_STOW_DIR~ defined below - and stows them in the root
+# of my home directory. Companion target ~spacemacs-unstow~ unstows them.
+
+# Stow makes it easy to try out the latest spacemacs: you 1) unstow the current
+# spacemacs installation, 2) clone the latest spacemacs and my spacemacs
+# configuration to another stow directory and 3) stow them. If you want to revert
+# to the previous spacemacs installation, you unstow the current one and stow the
+# previous one. Note that this workflow is not automated behind a target.
+
 .PHONY: spacemacs spacemacs-unstow
 
 SPACEMACS_COMMIT=679040f
@@ -331,7 +341,7 @@ install-spacemacs-dependencies:
 # create this target was to be able to transfer a working Spacemacs installation
 # to a machine that could not access elpa (and therefore could not download the
 # required Emacs packages).
-#
+
 # As a bonus, the tarball allows you to install a working installation on any
 # machine in a known-good state. With a fresh installation that downloads the
 # latest versions of its dependent packages there's a change things don't work
