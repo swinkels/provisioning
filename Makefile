@@ -2,6 +2,8 @@
 
 # * Main variables
 
+HOSTNAME=$(shell hostname)
+
 ifeq ($(STOW_DIR),)
 export STOW_DIR=$(HOME)/.local/stow
 endif
@@ -52,7 +54,13 @@ no-target:
 # yadm provides configurations for other software: with those configurations
 # already in place, that software can start fully configured.
 
-nunhems: stow git yadm keychain zsh fzf restic ripgrep tmux $(HOME)/.emacs.d spacemacs-config
+# The machines at Nunhems cannot reach elpa so on these machines, you cannot
+# install spacemacs from scratch using target ~spacemacs~. To work around that,
+# targets ~$(HOME)/.emacs.d~ and ~$(HOME)/.spacemacs.d~ install an existing
+# installation that was transferred from another machine.
+
+nunhems: stow git yadm keychain zsh fzf restic ripgrep tmux pipx $(HOME)/.emacs.d $(HOME)/.spacemacs.d pyls
+
 	# The following packages should be available: $^
 
 # * Application installation & configuration
@@ -251,6 +259,20 @@ $(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE):
 	# Download libtool source package to the packages directory
 	wget $(WGET_OPTIONS) http://ftp.jaist.ac.jp/pub/GNU/libtool/$(LIBTOOL_ARCHIVE)
 
+# ** pipx
+
+ifeq ($(HOSTNAME), bioinformatics-dev.adpa6.local)
+PYTHON=python3.8
+else
+PYTHON=python
+endif
+
+pipx: ~/.local/bin/pipx
+
+~/.local/bin/pipx:
+	# Install pipx using pip
+	$(PYTHON) -m pip install --user pipx
+
 # ** restic
 
 .PHONY: restic
@@ -359,6 +381,18 @@ SPACEMACS_INSTALL_ARCHIVE=$(HOST_SPEC)-$(EMACS_SPEC)-$(SPACEMACS_REPO_SPEC)-$(SP
 
 spacemacs-create-tarball:
 	tar cvzf $(PACKAGE_DIR)/$(SPACEMACS_INSTALL_ARCHIVE) -C $(GIT_REPOS_DIR) spacemacs-production
+
+.PHONY: pyls
+
+PYLS_VERSION=0.36.2
+
+pyls: ~/.local/bin/pyls
+
+~/.local/bin/pyls: ~/.local/bin/pipx
+	# Install pyls using pipx
+	pipx install python-language-server==$(PYLS_VERSION)
+	# Install flake8 in the virtualenv of pyls
+	pipx inject python-language-server flake8
 
 # ** stow
 
