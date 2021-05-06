@@ -67,6 +67,14 @@ nunhems: stow git yadm keychain zsh fzf restic ripgrep tmux pipx $(HOME)/.emacs.
 
 # ** emacs
 
+.PHONY: emacs jansson
+
+# Emacs 27.x (and newer) has "natively compiled" support for handling JSON data.
+# This means that it can handle JSON via the much quicker C library ~jansson~
+# instead of Elisp. Especially the communication from and to language servers
+# should see a performance boost. Target ~jansson~ downloads, builds and
+# installs that C library.
+
 EMACS_VERSION=27.1
 EMACS_ARCHIVE_DIR=emacs-$(EMACS_VERSION)
 EMACS_ARCHIVE=$(EMACS_ARCHIVE_DIR).tar.gz
@@ -81,20 +89,25 @@ EMACS_EXTRA_CONFIGURE_OPTIONS= \
   --with-x-toolkit=no \
   --with-xpm=ifavailable
 endif
+EMACS_EXTRA_CONFIGURE_OPTIONS += CPPFLAGS=-I$(HOME)/.local/include LDFLAGS=-L$(HOME)/.local/lib
 
-emacs: ~/.local/bin/emacs
+emacs: jansson ~/.local/bin/emacs
 
 ~/.local/bin/emacs: $(STOW_DIR)/$(EMACS_ARCHIVE_DIR)/bin/emacs
 	# Install Emacs using Stow
-	stow $(EMACS_ARCHIVE_DIR) && touch $@
+	[ -L $@ ] && [ -e $@ ] || stow $(EMACS_ARCHIVE_DIR)
 
 $(STOW_DIR)/$(EMACS_ARCHIVE_DIR)/bin/emacs: $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)/src/emacs
 	# Install Emacs to Stow directory
 	cd $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR) && make install
 
+# ~configure~ looks at the path of environment variable ~PKG_CONFIG_PATH~ to
+# determine whether ~jansson~ is installed. As we installed ~jansson~ locally,
+# we set it accordingly.
+$(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)/src/emacs: export PKG_CONFIG_PATH=$(HOME)/.local/lib/pkgconfig
 $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)/src/emacs: | $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)
 	# Build Emacs from source
-	cd $| && ./configure $(EMACS_EXTRA_CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(EMACS_ARCHIVE_DIR) && make
+	cd $| && ./configure $(EMACS_EXTRA_CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(EMACS_ARCHIVE_DIR) # && make
 
 $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR): $(PACKAGE_DIR)/$(EMACS_ARCHIVE)
 	# Uncompress Emacs source package
@@ -103,6 +116,32 @@ $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR): $(PACKAGE_DIR)/$(EMACS_ARCHIVE)
 $(PACKAGE_DIR)/$(EMACS_ARCHIVE):
 	# Download Emacs source package to the packages directory
 	wget $(WGET_OPTIONS) http://ftp.snt.utwente.nl/pub/software/gnu/emacs/$(EMACS_ARCHIVE)
+
+JANSSON_VERSION=2.13
+JANSSON_ARCHIVE_DIR=jansson-$(JANSSON_VERSION)
+JANSSON_ARCHIVE=$(JANSSON_ARCHIVE_DIR).tar.gz
+
+jansson: ~/.local/lib/libjansson.so
+
+~/.local/lib/libjansson.so: $(STOW_DIR)/$(JANSSON_ARCHIVE_DIR)/lib/libjansson.so
+	# Install jansson using Stow
+	[ -L $@ ] && [ -e $@ ] || stow $(JANSSON_ARCHIVE_DIR)
+
+$(STOW_DIR)/$(JANSSON_ARCHIVE_DIR)/lib/libjansson.so: $(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR)/src/.lib/libjansson.so
+	# Install jansson to Stow directory
+	cd $(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR) && make install
+
+$(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR)/src/.lib/libjansson.so: | $(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR)
+	# Build jansson from source
+	cd $| && ./configure --prefix=$(STOW_DIR)/$(JANSSON_ARCHIVE_DIR) && make
+
+$(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR): $(PACKAGE_DIR)/$(JANSSON_ARCHIVE)
+	# Uncompress jansson source package
+	tar xzf $< -C $(PACKAGE_DIR)
+
+$(PACKAGE_DIR)/$(JANSSON_ARCHIVE):
+	# Download jansson source package to the packages directory
+	wget $(WGET_OPTIONS) http://digip.org/jansson/releases/$(JANSSON_ARCHIVE)
 
 # ** git
 
@@ -368,6 +407,11 @@ install-spacemacs-dependencies:
 # machine in a known-good state. With a fresh installation that downloads the
 # latest versions of its dependent packages there's a change things don't work
 # as expected.
+
+# The target creates the tarball in the packages/ subdirectory and names it
+# according to the scheme defined in variable ~SPACEMACS_INSTALL_ARCHIVE~, e.g.
+#
+#   martin-emacs-27.1-spacemacs-679040f-spacemacs-config-43e1844-20210501-093008.tgz
 
 .PHONY: spacemacs-create-tarball
 
