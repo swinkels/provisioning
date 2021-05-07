@@ -89,7 +89,7 @@ EMACS_EXTRA_CONFIGURE_OPTIONS= \
   --with-x-toolkit=no \
   --with-xpm=ifavailable
 endif
-EMACS_EXTRA_CONFIGURE_OPTIONS += CPPFLAGS=-I$(HOME)/.local/include LDFLAGS=-L$(HOME)/.local/lib
+EMACS_EXTRA_CONFIGURE_OPTIONS += CPPFLAGS=-I$(HOME)/.local/include LDFLAGS="-L$(HOME)/.local/lib -Wl,-rpath,$(HOME)/.local/lib"
 
 emacs: jansson ~/.local/bin/emacs
 
