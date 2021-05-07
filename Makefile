@@ -127,11 +127,11 @@ jansson: ~/.local/lib/libjansson.so
 	# Install jansson using Stow
 	[ -L $@ ] && [ -e $@ ] || stow $(JANSSON_ARCHIVE_DIR)
 
-$(STOW_DIR)/$(JANSSON_ARCHIVE_DIR)/lib/libjansson.so: $(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR)/src/.lib/libjansson.so
+$(STOW_DIR)/$(JANSSON_ARCHIVE_DIR)/lib/libjansson.so: $(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR)/src/.libs/libjansson.so
 	# Install jansson to Stow directory
 	cd $(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR) && make install
 
-$(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR)/src/.lib/libjansson.so: | $(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR)
+$(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR)/src/.libs/libjansson.so: | $(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR)
 	# Build jansson from source
 	cd $| && ./configure --prefix=$(STOW_DIR)/$(JANSSON_ARCHIVE_DIR) && make
 
