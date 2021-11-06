@@ -382,7 +382,7 @@ $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.gz:
 
 .PHONY: spacemacs spacemacs-unstow
 
-SPACEMACS_COMMIT=679040f
+SPACEMACS_COMMIT=500335a
 SPACEMACS_STOW_DIR=$(GIT_REPOS_DIR)/spacemacs-production
 
 # spacemacs uses emacs-libterm, which needs cmake and libtool to build some of its
