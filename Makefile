@@ -259,6 +259,36 @@ fzf: ~/.fzf/bin/fzf-tmux
 	# Clone fzf to its installation directory
 	git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 
+# ** graphviz
+
+.PHONY: graphviz
+
+GRAPHVIZ_VERSION=2.49.1
+GRAPHVIZ_ARCHIVE_DIR=graphviz-$(GRAPHVIZ_VERSION)
+GRAPHVIZ_ARCHIVE=$(GRAPHVIZ_ARCHIVE_DIR).tar.gz
+
+graphviz: ~/.local/bin/graphviz
+
+~/.local/bin/graphviz: $(STOW_DIR)/$(GRAPHVIZ_ARCHIVE_DIR)/bin
+	# Install graphviz using Stow
+	stow $(GRAPHVIZ_ARCHIVE_DIR) && touch $@
+
+$(STOW_DIR)/$(GRAPHVIZ_ARCHIVE_DIR)/bin: $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE_DIR)/cmd/dot
+	# Install graphviz to Stow directory
+	cd $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE_DIR) && make install
+
+$(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE_DIR)/src/graphviz: | $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE_DIR)
+	# Build graphviz from source
+	cd $| && ./configure --prefix=$(STOW_DIR)/$(GRAPHVIZ_ARCHIVE_DIR) && make
+
+$(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE_DIR): $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE)
+	# Uncompress graphviz source package
+	tar xzf $< -C $(PACKAGE_DIR)
+
+$(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE):
+	# Download graphviz source package to the packages directory
+	wget $(WGET_OPTIONS) https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/$(GRAPHVIZ_VERSION)/$(GRAPHVIZ_ARCHIVE)
+
 # ** keychain
 
 .PHONY: keychain
