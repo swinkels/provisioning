@@ -586,7 +586,7 @@ oh-my-zsh: $(HOME)/.oh-my-zsh
 
 $(HOME)/.oh-my-zsh: ${PACKAGE_DIR}/oh-my-zsh/install.sh
 	# Install oh-my-zsh using its installation script
-	cd ${PACKAGE_DIR}/oh-my-zsh && CHSH=NO RUNZSH=NO ./install.sh
+	cd ${PACKAGE_DIR}/oh-my-zsh && ./install.sh --unattended --keep-zshrc
 
 ${PACKAGE_DIR}/oh-my-zsh/install.sh: | ${PACKAGE_DIR}/oh-my-zsh
 	# Download oh-my-zsh installation script to the packages subdirectory
