@@ -556,14 +556,14 @@ zsh: zsh-install oh-my-zsh
 # How to prefix an existing file is from
 # https://www.cyberciti.biz/faq/bash-prepend-text-lines-to-file/.
 zsh-install: ~/.local/bin/zsh
-	@if ! grep -q "export SHELL=~/.local/bin/zsh" $(BASH_PROFILE) ; then \
-		echo -e "$$EXEC_LOCAL_ZSH\n`cat $(BASH_PROFILE)`" > $(BASH_PROFILE) ; \
-	fi
-	# zsh is installed
 
 ~/.local/bin/zsh: $(STOW_DIR)/$(ZSH_ARCHIVE_DIR)/bin
 	# Install zsh using Stow
 	stow $(ZSH_ARCHIVE_DIR) && touch $@
+	@if ! grep -q "export SHELL=~/.local/bin/zsh" $(BASH_PROFILE) ; then \
+	  @echo "# Update bash profile to call zsh" \
+		echo -e "$$EXEC_LOCAL_ZSH\n`cat $(BASH_PROFILE)`" > $(BASH_PROFILE) ; \
+	fi
 
 $(STOW_DIR)/$(ZSH_ARCHIVE_DIR)/bin: $(PACKAGE_DIR)/$(ZSH_ARCHIVE_DIR)/Src/zsh
 	# Install zsh to Stow directory
@@ -582,7 +582,6 @@ $(PACKAGE_DIR)/$(ZSH_ARCHIVE):
 	wget $(WGET_OPTIONS) https://www.zsh.org/pub/$(ZSH_ARCHIVE)
 
 oh-my-zsh: $(HOME)/.oh-my-zsh
-	# oh-my-zsh is installed
 
 $(HOME)/.oh-my-zsh: ${PACKAGE_DIR}/oh-my-zsh/install.sh
 	# Install oh-my-zsh using its installation script
