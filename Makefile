@@ -678,16 +678,6 @@ yadm-install: ~/.local/bin/yadm
 	# Link the yadm script to a directory in PATH
 	ln -s $(PACKAGE_DIR)/yadm/yadm $@
 
-yadm-config:
-ifeq ($(PROVISIONING_ENV), Nunhems)
-	# Configure yadm for use at $(PROVISIONING_ENV)
-	yadm gitconfig user.name "Pieter Swinkels"
-	yadm gitconfig user.email swinkels.pieter@yahoo.com
-	yadm config local.class $(PROVISIONING_ENV)
-else
-	@true
-endif
-
 $(PACKAGE_DIR)/yadm: | $(PACKAGE_DIR)
 	# Clone yadm version $(YADM_VERSION) to the packages directory
 	cd $(PACKAGE_DIR) && git clone --branch $(YADM_VERSION) https://github.com/TheLocehiliosan/yadm.git
@@ -695,6 +685,9 @@ $(PACKAGE_DIR)/yadm: | $(PACKAGE_DIR)
 ~/.config/yadm/repo.git:
 	# Let yadm clone my personal set of dotfiles
 	yadm clone https://github.com/swinkels/yadm-dotfiles.git
+ifeq ($(PROVISIONING_ENV), Nunhems)
+	yadm config local.class $(PROVISIONING_ENV)
+endif
 
 # * Backup
 
