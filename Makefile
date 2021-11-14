@@ -670,7 +670,7 @@ $(HOME)/tmp/$(CLANG_ARCHIVE): | $(HOME)/tmp
 
 YADM_VERSION=2.4.0
 
-yadm: yadm-install yadm-config | ~/.config/yadm/repo.git
+yadm: yadm-install | ~/.config/yadm/repo.git
 
 yadm-install: ~/.local/bin/yadm
 
