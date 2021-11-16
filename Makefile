@@ -523,7 +523,7 @@ tmux: ~/.local/bin/tmux
 
 $(PACKAGE_DIR)/$(TMUX_APP_IMAGE): | $(PACKAGE_DIR)
 	# Download tmux version $(TMUX_VERSION) to the packages directory
-	wget $(WGET_OPTIONS) https://github.com/tmux/tmux/releases/download/$(TMUX_VERSION)/$(TMUX_APP_IMAGE) && chmod 700 $(TMUX_APP_IMAGE)
+	wget $(WGET_OPTIONS) https://github.com/tmux/tmux/releases/download/$(TMUX_VERSION)/$(TMUX_APP_IMAGE) && chmod 700 $@
 
 $(PACKAGE_DIR):
 	# Create the directory to store packages
