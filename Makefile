@@ -293,23 +293,28 @@ $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE):
 .PHONY: keychain
 
 KEYCHAIN_VERSION=2.8.5
-KEYCHAIN_PACKAGE_DIR=keychain-$(KEYCHAIN_VERSION)
-
-EVAL_KEYCHAIN_COMMAND="eval \`keychain --eval --agents ssh id_rsa\`"
+KEYCHAIN_ARCHIVE_DIR=keychain-$(KEYCHAIN_VERSION)
+KEYCHAIN_ARCHIVE=$(KEYCHAIN_VERSION).tar.gz
 
 keychain: ~/.local/bin/keychain
 
-~/.local/bin/keychain: $(PACKAGE_DIR)/$(KEYCHAIN_PACKAGE_DIR)/keychain
-	# Link the ripgrep binary to a directory in PATH
-	ln -s $< $@
+~/.local/bin/keychain: $(STOW_DIR)/$(KEYCHAIN_ARCHIVE_DIR)/bin/keychain
+	# Install keychain using Stow
+	stow $(KEYCHAIN_ARCHIVE_DIR) && touch $@
 
-$(PACKAGE_DIR)/$(KEYCHAIN_PACKAGE_DIR)/keychain: | $(PACKAGE_DIR)/$(KEYCHAIN_VERSION).tar.gz
+$(STOW_DIR)/$(KEYCHAIN_ARCHIVE_DIR)/bin/keychain: $(PACKAGE_DIR)/$(KEYCHAIN_ARCHIVE_DIR)/keychain
+	# Copy keychain script to Stow directory
+	mkdir -p $(STOW_DIR)/$(KEYCHAIN_ARCHIVE_DIR)/bin && cp $< $@
+	# Restrict access to main keychain script
+	chmod g-rwx $@ && chmod o-rwx $@
+
+$(PACKAGE_DIR)/$(KEYCHAIN_ARCHIVE_DIR)/keychain: $(PACKAGE_DIR)/$(KEYCHAIN_ARCHIVE)
 	# Uncompress keychain archive
-	cd $(PACKAGE_DIR) && tar xvzf $(KEYCHAIN_VERSION).tar.gz && chmod 700 $(KEYCHAIN_PACKAGE_DIR)/keychain
+	tar xvzf $< -C $(PACKAGE_DIR) --touch
 
-$(PACKAGE_DIR)/$(KEYCHAIN_VERSION).tar.gz:
-	# Download keychain version $(KEYCHAIN_VERSION) to the packages directory
-	wget $(WGET_OPTIONS) https://github.com/funtoo/keychain/archive/$(KEYCHAIN_VERSION).tar.gz
+$(PACKAGE_DIR)/$(KEYCHAIN_ARCHIVE):
+	# Download keychain version $(KEYCHAIN_VERSION)
+	wget $(WGET_OPTIONS) https://github.com/funtoo/keychain/archive/$(KEYCHAIN_ARCHIVE)
 
 # ** libtool
 
