@@ -18,6 +18,8 @@ MAKEFILE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 PACKAGE_DIR=$(MAKEFILE_DIR)/packages
 
+CONFIGURE_OPTIONS=CPPFLAGS=-I$(HOME)/.local/include LDFLAGS="-L$(HOME)/.local/lib -Wl,-rpath,$(HOME)/.local/lib"
+
 WGET_OPTIONS=--timestamping --directory-prefix=$(PACKAGE_DIR)
 
 # * Default target
@@ -89,7 +91,6 @@ EMACS_EXTRA_CONFIGURE_OPTIONS= \
   --with-x-toolkit=no \
   --with-xpm=ifavailable
 endif
-EMACS_EXTRA_CONFIGURE_OPTIONS += CPPFLAGS=-I$(HOME)/.local/include LDFLAGS="-L$(HOME)/.local/lib -Wl,-rpath,$(HOME)/.local/lib"
 
 emacs: jansson ~/.local/bin/emacs
 
@@ -107,7 +108,7 @@ $(STOW_DIR)/$(EMACS_ARCHIVE_DIR)/bin/emacs: $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)/
 $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)/src/emacs: export PKG_CONFIG_PATH=$(HOME)/.local/lib/pkgconfig
 $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)/src/emacs: | $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR)
 	# Build Emacs from source
-	cd $| && ./configure $(EMACS_EXTRA_CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(EMACS_ARCHIVE_DIR) # && make
+	cd $| && ./configure $(CONFIGURE_OPTIONS) $(EMACS_EXTRA_CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(EMACS_ARCHIVE_DIR) # && make
 
 $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR): $(PACKAGE_DIR)/$(EMACS_ARCHIVE)
 	# Uncompress Emacs source package
@@ -133,7 +134,7 @@ $(STOW_DIR)/$(JANSSON_ARCHIVE_DIR)/lib/libjansson.so: $(PACKAGE_DIR)/$(JANSSON_A
 
 $(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR)/src/.libs/libjansson.so: | $(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR)
 	# Build jansson from source
-	cd $| && ./configure --prefix=$(STOW_DIR)/$(JANSSON_ARCHIVE_DIR) && make
+	cd $| && ./configure $(CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(JANSSON_ARCHIVE_DIR) && make
 
 $(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR): $(PACKAGE_DIR)/$(JANSSON_ARCHIVE)
 	# Uncompress jansson source package
@@ -151,8 +152,6 @@ GIT_VERSION=2.30.1
 GIT_ARCHIVE_DIR=git-$(GIT_VERSION)
 GIT_ARCHIVE=v$(GIT_VERSION).tar.gz
 
-GIT_EXTRA_CONFIGURE_OPTIONS += CPPFLAGS=-I$(HOME)/.local/include LDFLAGS="-L$(HOME)/.local/lib -Wl,-rpath,$(HOME)/.local/lib"
-
 git: curl ~/.local/bin/git
 
 # You need to compile git with curl-devel present, otherwise it cannot use the
@@ -169,7 +168,7 @@ $(STOW_DIR)/$(GIT_ARCHIVE_DIR)/bin/git: $(PACKAGE_DIR)/$(GIT_ARCHIVE_DIR)/git
 
 $(PACKAGE_DIR)/$(GIT_ARCHIVE_DIR)/git: | $(PACKAGE_DIR)/git-$(GIT_VERSION)
 	# Build git from source
-	cd $| && autoconf && ./configure $(GIT_EXTRA_CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(GIT_ARCHIVE_DIR) && make
+	cd $| && autoconf && ./configure $(CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(GIT_ARCHIVE_DIR) && make
 
 $(PACKAGE_DIR)/git-$(GIT_VERSION): $(PACKAGE_DIR)/$(GIT_ARCHIVE)
 	# Uncompress git source package
@@ -199,7 +198,7 @@ $(STOW_DIR)/$(CMAKE_ARCHIVE_DIR)/bin/cmake: $(PACKAGE_DIR)/$(CMAKE_ARCHIVE_DIR)/
 
 $(PACKAGE_DIR)/$(CMAKE_ARCHIVE_DIR)/bin/cmake: | $(PACKAGE_DIR)/$(CMAKE_ARCHIVE_DIR)
 	# Build cmake from source
-	cd $| && ./configure --prefix=$(STOW_DIR)/$(CMAKE_ARCHIVE_DIR) && make
+	cd $| && ./configure $(CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(CMAKE_ARCHIVE_DIR) && make
 
 $(PACKAGE_DIR)/$(CMAKE_ARCHIVE_DIR): $(PACKAGE_DIR)/$(CMAKE_ARCHIVE)
 	# Uncompress cmake source package
@@ -229,7 +228,7 @@ $(STOW_DIR)/$(CURL_ARCHIVE_DIR)/bin: $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)/src/curl
 
 $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)/src/curl: | $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)
 	# Build curl from source
-	cd $| && ./configure --prefix=$(STOW_DIR)/$(CURL_ARCHIVE_DIR) && make
+	cd $| && ./configure $(CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(CURL_ARCHIVE_DIR) && make
 
 $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR): $(PACKAGE_DIR)/$(CURL_ARCHIVE)
 	# Uncompress curl source package
@@ -279,7 +278,7 @@ $(STOW_DIR)/$(GRAPHVIZ_ARCHIVE_DIR)/bin: $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE_DIR)/
 
 $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE_DIR)/cmd/dot: | $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE_DIR)
 	# Build graphviz from source
-	cd $| && ./configure --prefix=$(STOW_DIR)/$(GRAPHVIZ_ARCHIVE_DIR) && make
+	cd $| && ./configure $(CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(GRAPHVIZ_ARCHIVE_DIR) && make
 
 $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE_DIR): $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE)
 	# Uncompress graphviz source package
@@ -332,7 +331,7 @@ $(STOW_DIR)/$(LIBTOOL_ARCHIVE_DIR)/bin/libtool: $(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE
 
 $(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE_DIR)/libtool: | $(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE_DIR)
 	# Build libtool from source
-	cd $| && ./configure --prefix=$(STOW_DIR)/$(LIBTOOL_ARCHIVE_DIR) && make
+	cd $| && ./configure $(CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(LIBTOOL_ARCHIVE_DIR) && make
 
 $(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE_DIR): $(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE)
 	# Uncompress libtool source package
@@ -525,7 +524,7 @@ stow: ~/.local/bin/stow
 
 $(PACKAGE_DIR)/$(STOW_ARCHIVE_DIR)/bin/stow: $(PACKAGE_DIR)/$(STOW_ARCHIVE_DIR)
 	# Build stow from source
-	cd $< && ./configure --prefix=$(HOME)/.local && make
+	cd $< && ./configure $(CONFIGURE_OPTIONS) --prefix=$(HOME)/.local && make
 
 $(PACKAGE_DIR)/$(STOW_ARCHIVE_DIR): $(PACKAGE_DIR)/$(STOW_ARCHIVE)
 	# Uncompress stow source package
@@ -598,7 +597,7 @@ $(STOW_DIR)/$(ZSH_ARCHIVE_DIR)/bin: $(PACKAGE_DIR)/$(ZSH_ARCHIVE_DIR)/Src/zsh
 
 $(PACKAGE_DIR)/$(ZSH_ARCHIVE_DIR)/Src/zsh: | $(PACKAGE_DIR)/$(ZSH_ARCHIVE_DIR)
 	# Build zsh from source
-	cd $| && ./configure --prefix=$(STOW_DIR)/$(ZSH_ARCHIVE_DIR) && make
+	cd $| && ./configure $(CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(ZSH_ARCHIVE_DIR) && make
 
 $(PACKAGE_DIR)/$(ZSH_ARCHIVE_DIR): $(PACKAGE_DIR)/$(ZSH_ARCHIVE)
 	# Uncompress zsh source package
