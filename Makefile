@@ -394,7 +394,7 @@ $(STOW_DIR)/restic-${RESTIC_VERSION}/bin/restic: $(PACKAGE_DIR)/$(RESTIC_ARCHIVE
 	# Allow execution of restic binary
 	chmod u+x $@
 	# Restrict access to restic binary
-	chmod u-w $@ && chmod g-wx $@ && chmod o-wx $@
+	chmod g-wx $@ && chmod o-wx $@
 
 $(PACKAGE_DIR)/$(RESTIC_ARCHIVE_DIR): $(PACKAGE_DIR)/$(RESTIC_ARCHIVE)
 	# Uncompress restic archive
@@ -586,7 +586,7 @@ $(STOW_DIR)/$(YADM_ARCHIVE_DIR)/bin/yadm: $(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yad
 	# Allow execution of yadm script
 	chmod u+x $@
 	# Restrict access to yadm script
-	chmod u-w $@ && chmod g-rwx $@ && chmod o-rwx $@
+	chmod g-rwx $@ && chmod o-rwx $@
 
 $(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm: $(PACKAGE_DIR)/$(YADM_ARCHIVE)
 	# Uncompress yadm archive
