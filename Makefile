@@ -277,7 +277,7 @@ $(STOW_DIR)/$(GRAPHVIZ_ARCHIVE_DIR)/bin: $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE_DIR)/
 	# Install graphviz to Stow directory
 	cd $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE_DIR) && make install
 
-$(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE_DIR)/src/graphviz: | $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE_DIR)
+$(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE_DIR)/cmd/dot: | $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE_DIR)
 	# Build graphviz from source
 	cd $| && ./configure --prefix=$(STOW_DIR)/$(GRAPHVIZ_ARCHIVE_DIR) && make
 
