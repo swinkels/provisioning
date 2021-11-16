@@ -391,22 +391,31 @@ pipx: ~/.local/bin/pipx
 
 .PHONY: restic
 
-RESTIC_VERSION=0.12.0
-RESTIC_PACKAGE=restic_$(RESTIC_VERSION)_linux_amd64
+RESTIC_VERSION=0.12.1
+RESTIC_ARCHIVE_DIR=restic_$(RESTIC_VERSION)_linux_amd64
+RESTIC_ARCHIVE=$(RESTIC_ARCHIVE_DIR).bz2
 
 restic: ~/.local/bin/restic
 
-~/.local/bin/restic: $(PACKAGE_DIR)/$(RESTIC_PACKAGE)
-	# Link the restic binary to a directory in PATH
-	ln -s $< $@
+~/.local/bin/restic: $(STOW_DIR)/restic-${RESTIC_VERSION}/bin/restic
+	# Install restic using Stow
+	stow restic-${RESTIC_VERSION} && touch $@
 
-$(PACKAGE_DIR)/$(RESTIC_PACKAGE): | $(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2
+$(STOW_DIR)/restic-${RESTIC_VERSION}/bin/restic: $(PACKAGE_DIR)/$(RESTIC_ARCHIVE_DIR)
+	# Copy restic binary to Stow directory
+	mkdir -p $(STOW_DIR)/restic-${RESTIC_VERSION}/bin && cp $< $@
+	# Allow execution of restic binary
+	chmod u+x $@
+	# Restrict access to restic binary
+	chmod u-w $@ && chmod g-wx $@ && chmod o-wx $@
+
+$(PACKAGE_DIR)/$(RESTIC_ARCHIVE_DIR): $(PACKAGE_DIR)/$(RESTIC_ARCHIVE)
 	# Uncompress restic archive
-	cd $(PACKAGE_DIR) && bzip2 --decompress $(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2 && chmod 700 $(RESTIC_PACKAGE)
+	cd $(PACKAGE_DIR) && bzip2 --decompress --keep $(PACKAGE_DIR)/$(RESTIC_ARCHIVE)
 
-$(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2:
-	# Download restic version $(RESTIC_VERSION) to the packages directory
-	wget $(WGET_OPTIONS) https://github.com/restic/restic/releases/download/v$(RESTIC_VERSION)/$(RESTIC_PACKAGE).bz2
+$(PACKAGE_DIR)/$(RESTIC_ARCHIVE):
+	# Download restic version $(RESTIC_VERSION)
+	wget $(WGET_OPTIONS) https://github.com/restic/restic/releases/download/v$(RESTIC_VERSION)/$(RESTIC_ARCHIVE)
 
 # ** ripgrep
 
