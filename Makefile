@@ -579,6 +579,40 @@ $(PACKAGE_DIR)/$(TMUX_APP_IMAGE):
 	# Download tmux version $(TMUX_VERSION)
 	wget $(WGET_OPTIONS) https://github.com/tmux/tmux/releases/download/$(TMUX_VERSION)/$(TMUX_APP_IMAGE)
 
+# ** yadm
+
+.PHONY: yadm yadm-install yadm-config
+
+YADM_VERSION=2.4.0
+YADM_ARCHIVE_DIR=yadm-$(YADM_VERSION)
+YADM_ARCHIVE=$(YADM_VERSION).tar.gz
+
+yadm: ~/.local/bin/yadm | ~/.config/yadm/repo.git
+
+~/.local/bin/yadm: $(STOW_DIR)/$(YADM_ARCHIVE_DIR)/bin/yadm
+	# Install yadm using Stow
+	stow $(YADM_ARCHIVE_DIR) && touch $@
+
+$(STOW_DIR)/$(YADM_ARCHIVE_DIR)/bin/yadm: $(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm
+	# Copy yadm script to Stow directory
+	mkdir -p $(STOW_DIR)/$(YADM_ARCHIVE_DIR)/bin && cp $< $@
+	# Allow execution of yadm script
+	chmod u+x $@
+	# Restrict access to yadm script
+	chmod u-w $@ && chmod g-rwx $@ && chmod o-rwx $@
+
+$(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm: $(PACKAGE_DIR)/$(YADM_ARCHIVE)
+	# Uncompress yadm archive
+	tar xvzf $< -C $(PACKAGE_DIR) --touch
+
+$(PACKAGE_DIR)/$(YADM_ARCHIVE):
+	# Download yadm version $(YADM_VERSION)
+	wget $(WGET_OPTIONS) https://github.com/TheLocehiliosan/yadm/archive/refs/tags/$(YADM_ARCHIVE)
+
+~/.config/yadm/repo.git:
+	# Let yadm clone my personal set of dotfiles
+	yadm clone https://github.com/swinkels/yadm-dotfiles.git
+
 # ** zsh
 
 .PHONY: zsh oh-my-zsh
@@ -714,29 +748,6 @@ $(HOME)/external_software/$(CLANG_NAME): $(HOME)/tmp/$(CLANG_ARCHIVE) | $(HOME)/
 
 $(HOME)/tmp/$(CLANG_ARCHIVE): | $(HOME)/tmp
 	cd $(HOME)/tmp && wget --timestamping http://releases.llvm.org/8.0.0/$(CLANG_ARCHIVE)
-
-.PHONY: yadm yadm-install yadm-config
-
-YADM_VERSION=2.4.0
-
-yadm: yadm-install | ~/.config/yadm/repo.git
-
-yadm-install: ~/.local/bin/yadm
-
-~/.local/bin/yadm: | $(PACKAGE_DIR)/yadm
-	# Link the yadm script to a directory in PATH
-	ln -s $(PACKAGE_DIR)/yadm/yadm $@
-
-$(PACKAGE_DIR)/yadm: | $(PACKAGE_DIR)
-	# Clone yadm version $(YADM_VERSION) to the packages directory
-	cd $(PACKAGE_DIR) && git clone --branch $(YADM_VERSION) https://github.com/TheLocehiliosan/yadm.git
-
-~/.config/yadm/repo.git:
-	# Let yadm clone my personal set of dotfiles
-	yadm clone https://github.com/swinkels/yadm-dotfiles.git
-ifeq ($(PROVISIONING_ENV), Nunhems)
-	yadm config local.class $(PROVISIONING_ENV)
-endif
 
 # * Backup
 
