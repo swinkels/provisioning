@@ -412,22 +412,27 @@ $(PACKAGE_DIR)/$(RESTIC_PACKAGE).bz2:
 
 .PHONY: ripgrep
 
-RIP_GREP_VERSION=12.1.1
-RIP_GREP_PACKAGE=ripgrep-$(RIP_GREP_VERSION)-x86_64-unknown-linux-musl
+RIPGREP_VERSION=12.1.1
+RIPGREP_ARCHIVE_DIR=ripgrep-$(RIPGREP_VERSION)-x86_64-unknown-linux-musl
+RIPGREP_ARCHIVE=$(RIPGREP_ARCHIVE_DIR).tar.gz
 
 ripgrep: ~/.local/bin/rg
 
-~/.local/bin/rg: $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE)/rg
-	# Link the ripgrep binary to a directory in PATH
-	ln -s $< $@
+~/.local/bin/rg: $(STOW_DIR)/ripgrep-${RIPGREP_VERSION}/bin/rg
+	# Install ripgrep using Stow
+	stow ripgrep-${RIPGREP_VERSION} && touch $@
 
-$(PACKAGE_DIR)/$(RIP_GREP_PACKAGE)/rg: | $(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.gz
+$(STOW_DIR)/ripgrep-${RIPGREP_VERSION}/bin/rg: $(PACKAGE_DIR)/$(RIPGREP_ARCHIVE_DIR)/rg
+	# Copy ripgrep to Stow directory
+	mkdir -p $(STOW_DIR)/ripgrep-${RIPGREP_VERSION}/bin && cp $< $@
+
+$(PACKAGE_DIR)/$(RIPGREP_ARCHIVE_DIR)/rg: $(PACKAGE_DIR)/$(RIPGREP_ARCHIVE)
 	# Uncompress ripgrep archive
-	cd $(PACKAGE_DIR) && tar xvzf $(RIP_GREP_PACKAGE).tar.gz
+	tar xvzf $< -C $(PACKAGE_DIR) --touch
 
-$(PACKAGE_DIR)/$(RIP_GREP_PACKAGE).tar.gz:
-	# Download ripgrep version $(RIP_GREP_VERSION) to the packages directory
-	wget $(WGET_OPTIONS) https://github.com/BurntSushi/ripgrep/releases/download/$(RIP_GREP_VERSION)/$(RIP_GREP_PACKAGE).tar.gz
+$(ARCHIVE_DIR_DIR)/$(RIPGREP_ARCHIVE):
+	# Download ripgrep version $(RIPGREP_VERSION)
+	wget $(WGET_OPTIONS) https://github.com/BurntSushi/ripgrep/releases/download/$(RIPGREP_VERSION)/$(RIPGREP_ARCHIVE)
 
 # ** spacemacs
 
