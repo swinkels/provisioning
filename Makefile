@@ -549,21 +549,26 @@ $(PACKAGE_DIR)/$(STOW_ARCHIVE):
 .PHONY: tmux
 
 TMUX_VERSION=3.1b
+TMUX_ARCHIVE_DIR=tmux-$(TMUX_VERSION)
 TMUX_APP_IMAGE=tmux-$(TMUX_VERSION)-x86_64.AppImage
 
 tmux: ~/.local/bin/tmux
 
-~/.local/bin/tmux: $(PACKAGE_DIR)/$(TMUX_APP_IMAGE)
-	# Link the tmux AppImage to a directory in PATH
-	ln -s $< $@
+~/.local/bin/tmux: $(STOW_DIR)/$(TMUX_ARCHIVE_DIR)/bin/tmux
+	# Install tmux using Stow
+	stow $(TMUX_ARCHIVE_DIR) && touch $@
 
-$(PACKAGE_DIR)/$(TMUX_APP_IMAGE): | $(PACKAGE_DIR)
-	# Download tmux version $(TMUX_VERSION) to the packages directory
-	wget $(WGET_OPTIONS) https://github.com/tmux/tmux/releases/download/$(TMUX_VERSION)/$(TMUX_APP_IMAGE) && chmod 700 $@
+$(STOW_DIR)/$(TMUX_ARCHIVE_DIR)/bin/tmux: $(PACKAGE_DIR)/$(TMUX_APP_IMAGE)
+	# Copy tmux AppImage to Stow directory
+	mkdir -p $(STOW_DIR)/$(TMUX_ARCHIVE_DIR)/bin && cp $< $@
+	# Allow execution of tmux AppImage
+	chmod u+x $@
+	# Restrict access to tmux AppImage
+	chmod g-wx $@ && chmod o-wx $@
 
-$(PACKAGE_DIR):
-	# Create the directory to store packages
-	- mkdir -p $(PACKAGE_DIR)
+$(PACKAGE_DIR)/$(TMUX_APP_IMAGE):
+	# Download tmux version $(TMUX_VERSION)
+	wget $(WGET_OPTIONS) https://github.com/tmux/tmux/releases/download/$(TMUX_VERSION)/$(TMUX_APP_IMAGE)
 
 # ** zsh
 
