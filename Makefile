@@ -159,7 +159,7 @@ $(PACKAGE_DIR)/$(GIT_ARCHIVE_DIR)/git: | $(PACKAGE_DIR)/git-$(GIT_VERSION)
 
 $(PACKAGE_DIR)/git-$(GIT_VERSION): $(PACKAGE_DIR)/$(GIT_ARCHIVE)
 	# Uncompress git source package
-	tar xvzf $< -C $(PACKAGE_DIR)
+	tar xzf $< -C $(PACKAGE_DIR)
 
 $(PACKAGE_DIR)/$(GIT_ARCHIVE):
 	# Download git source package to the packages directory
@@ -297,7 +297,7 @@ $(STOW_DIR)/$(KEYCHAIN_ARCHIVE_DIR)/bin/keychain: $(PACKAGE_DIR)/$(KEYCHAIN_ARCH
 
 $(PACKAGE_DIR)/$(KEYCHAIN_ARCHIVE_DIR)/keychain: $(PACKAGE_DIR)/$(KEYCHAIN_ARCHIVE)
 	# Uncompress keychain archive
-	tar xvzf $< -C $(PACKAGE_DIR) --touch
+	tar xzf $< -C $(PACKAGE_DIR) --touch
 
 $(PACKAGE_DIR)/$(KEYCHAIN_ARCHIVE):
 	# Download keychain version $(KEYCHAIN_VERSION)
@@ -539,7 +539,7 @@ $(PACKAGE_DIR)/$(STOW_ARCHIVE_DIR)/bin/stow: $(PACKAGE_DIR)/$(STOW_ARCHIVE_DIR)
 
 $(PACKAGE_DIR)/$(STOW_ARCHIVE_DIR): $(PACKAGE_DIR)/$(STOW_ARCHIVE)
 	# Uncompress stow source package
-	tar xvzf $< --directory $(PACKAGE_DIR)
+	tar xzf $< --directory $(PACKAGE_DIR)
 
 $(PACKAGE_DIR)/$(STOW_ARCHIVE):
 	# Download stow source package to the packages directory
