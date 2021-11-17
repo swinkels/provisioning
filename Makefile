@@ -589,12 +589,12 @@ $(STOW_DIR)/$(YADM_ARCHIVE_DIR)/bin/yadm: $(PACKAGE_DIR)/yadm-no-retrieve
 	chmod g-rwx $@ && chmod o-rwx $@
 
 $(PACKAGE_DIR)/yadm-no-retrieve:
-	$(MAKE) $(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm
-	touch $@
+	@$(MAKE) --no-print-directory $(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm
+	@touch $@
 
 $(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm: $(PACKAGE_DIR)/$(YADM_ARCHIVE)
 	# Uncompress yadm archive
-	tar xvzf $< -C $(PACKAGE_DIR)
+	tar xzf $< -C $(PACKAGE_DIR)
 
 $(PACKAGE_DIR)/$(YADM_ARCHIVE):
 	# Download yadm version $(YADM_VERSION)
