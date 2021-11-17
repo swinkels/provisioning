@@ -52,6 +52,10 @@ nunhems: stow git yadm keychain zsh fzf restic ripgrep tmux pipx $(HOME)/.emacs.
 
 	# The following packages should be available: $^
 
+$(PACKAGE_DIR):
+	# Create directory to download and build packages
+	mkdir -p $@
+
 # * Application installation & configuration
 
 # ** emacs
@@ -197,32 +201,69 @@ $(PACKAGE_DIR)/$(CMAKE_ARCHIVE):
 
 # ** curl
 
-.PHONY: curl
+.PHONY: curl curl-uninstall install-curl-to-stow
 
 CURL_VERSION=7.75.0
-CURL_ARCHIVE_DIR=curl-$(CURL_VERSION)
-CURL_ARCHIVE=$(CURL_ARCHIVE_DIR).tar.gz
+CURL_NAME_VERSION=curl-$(CURL_VERSION)
+CURL_STOW_DIR=$(STOW_DIR)/$(CURL_NAME_VERSION)
+CURL_ARCHIVE_DIR=$(PACKAGE_DIR)/curl-$(CURL_VERSION)
+CURL_ARCHIVE=curl-$(CURL_VERSION).tar.gz
 
 curl: ~/.local/bin/curl
 
-~/.local/bin/curl: $(STOW_DIR)/$(CURL_ARCHIVE_DIR)/bin
+# The next target is a symlink. Note that to compare modification times (of
+# target and prerequisites), ~make~ looks at the mtime of the /destination of
+# the symlink/. However it /does/ check whether the symlink exists so if the
+# symlink is not present, ~make~ executes the commands for that target.
+
+# In an earlier version, the prerequisite of the next target was
+# $(CURL_STOW_DIR). That directory has an mtime that is at least the mtime of
+# $(CURL_STOW_DIR)/bin/curl, which is the destination of the (target) symlink.
+# For all intents and purposes this meant that the target was always out-of-date
+# and the Stow command would always execute.
+
+~/.local/bin/curl: $(CURL_STOW_DIR)/bin/curl
 	# Install curl using Stow
-	stow $(CURL_ARCHIVE_DIR) && touch $@
+	stow $(CURL_NAME_VERSION)
 
-$(STOW_DIR)/$(CURL_ARCHIVE_DIR)/bin: $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)/src/curl
+curl-uninstall:
+	# Uninstall curl using Stow
+	stow --delete $(CURL_NAME_VERSION) --target=$(HOME)/.local
+	# Delete curl from Stow directory
+	rm -rfI $(CURL_STOW_DIR)
+
+# The next target allows us to remove the files from $(PACKAGE_DIR) that are
+# required to build and install curl (to save disk space). A "make curl" will
+# only recreate curl-related files in $(PACKAGE_DIR) when
+# $(CURL_STOW_DIR)/bin/curl doesn't exist.
+
+$(CURL_STOW_DIR)/bin/curl:
+	@$(MAKE) --no-print-directory install-curl-to-stow
+
+# Don't let the name of the prerequisite of the next target fool you. It refers
+# to the curl binary that will be build.
+
+install-curl-to-stow: $(CURL_ARCHIVE_DIR)/src/curl
 	# Install curl to Stow directory
-	cd $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR) && make install
+	cd $(CURL_ARCHIVE_DIR) && make install
 
-$(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)/src/curl: | $(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR)
-	# Build curl from source
-	cd $| && ./configure $(CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(CURL_ARCHIVE_DIR) && make
+$(CURL_ARCHIVE_DIR)/src/curl: $(CURL_ARCHIVE_DIR)/configure
+	# Configure curl build
+	cd $(CURL_ARCHIVE_DIR) && ./configure $(CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(CURL_NAME_VERSION)
+	# Build curl
+	cd $(CURL_ARCHIVE_DIR) && make
 
-$(PACKAGE_DIR)/$(CURL_ARCHIVE_DIR): $(PACKAGE_DIR)/$(CURL_ARCHIVE)
+# The next target also updates the timestamp of the target file, which is one of
+# the uncompressed files. In this way the archive is only uncompressed once as
+# the timestamp of the archive is older.
+
+$(CURL_ARCHIVE_DIR)/configure: $(PACKAGE_DIR)/$(CURL_ARCHIVE)
 	# Uncompress curl source package
 	tar xzf $< -C $(PACKAGE_DIR)
+	@touch $@
 
-$(PACKAGE_DIR)/$(CURL_ARCHIVE):
-	# Download curl source package to the packages directory
+$(PACKAGE_DIR)/$(CURL_ARCHIVE): $(PACKAGE_DIR)
+	# Download curl version $(CURL_VERSION)
 	wget $(WGET_OPTIONS) https://curl.se/download/$(CURL_ARCHIVE)
 
 # ** fzf
