@@ -576,24 +576,25 @@ $(PACKAGE_DIR)/$(TMUX_APP_IMAGE):
 .PHONY: yadm
 
 YADM_VERSION=2.4.0
+YADM_NAME_VERSION=yadm-$(YADM_VERSION)
 YADM_ARCHIVE_DIR=yadm-$(YADM_VERSION)
 YADM_ARCHIVE=$(YADM_VERSION).tar.gz
 
 yadm: ~/.local/bin/yadm ~/.config/yadm/repo.git
 
-~/.local/bin/yadm: $(STOW_DIR)/$(YADM_ARCHIVE_DIR)/bin/yadm
+~/.local/bin/yadm: $(STOW_DIR)/$(YADM_NAME_VERSION)/bin/yadm
 	# Install yadm using Stow
-	stow $(YADM_ARCHIVE_DIR) && touch $@
+	stow $(YADM_NAME_VERSION) && touch $@
 
-$(STOW_DIR)/$(YADM_ARCHIVE_DIR)/bin/yadm: $(PACKAGE_DIR)/yadm-no-retrieve
+$(STOW_DIR)/$(YADM_ARCHIVE_DIR)/bin/yadm: $(PACKAGE_DIR)/$(YADM_NAME_VERSION)-no-retrieve
 	# Copy yadm script to Stow directory
-	mkdir -p $(STOW_DIR)/$(YADM_ARCHIVE_DIR)/bin && cp $(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm $@
+	mkdir -p $(STOW_DIR)/$(YADM_NAME_VERSION)/bin && cp $(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm $@
 	# Allow execution of yadm script
 	chmod u+x $@
 	# Restrict access to yadm script
 	chmod g-rwx $@ && chmod o-rwx $@
 
-$(PACKAGE_DIR)/yadm-no-retrieve:
+$(PACKAGE_DIR)/$(YADM_NAME_VERSION)-no-retrieve:
 	@$(MAKE) --no-print-directory $(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm
 	@touch $@
 
