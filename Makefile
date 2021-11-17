@@ -20,7 +20,7 @@ PACKAGE_DIR=$(MAKEFILE_DIR)/packages
 
 CONFIGURE_OPTIONS=CPPFLAGS=-I$(HOME)/.local/include LDFLAGS="-L$(HOME)/.local/lib -Wl,-rpath,$(HOME)/.local/lib"
 
-WGET_OPTIONS=--timestamping --directory-prefix=$(PACKAGE_DIR)
+WGET_OPTIONS=--directory-prefix=$(PACKAGE_DIR) --quiet --timestamping
 
 # * Default target
 
