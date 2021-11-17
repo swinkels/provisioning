@@ -568,7 +568,7 @@ $(PACKAGE_DIR)/$(TMUX_APP_IMAGE):
 
 # ** yadm
 
-.PHONY: yadm yadm-install yadm-config
+.PHONY: yadm
 
 YADM_VERSION=2.4.0
 YADM_ARCHIVE_DIR=yadm-$(YADM_VERSION)
