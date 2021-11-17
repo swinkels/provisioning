@@ -574,23 +574,27 @@ YADM_VERSION=2.4.0
 YADM_ARCHIVE_DIR=yadm-$(YADM_VERSION)
 YADM_ARCHIVE=$(YADM_VERSION).tar.gz
 
-yadm: ~/.local/bin/yadm | ~/.config/yadm/repo.git
+yadm: ~/.local/bin/yadm ~/.config/yadm/repo.git
 
 ~/.local/bin/yadm: $(STOW_DIR)/$(YADM_ARCHIVE_DIR)/bin/yadm
 	# Install yadm using Stow
 	stow $(YADM_ARCHIVE_DIR) && touch $@
 
-$(STOW_DIR)/$(YADM_ARCHIVE_DIR)/bin/yadm: $(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm
+$(STOW_DIR)/$(YADM_ARCHIVE_DIR)/bin/yadm: $(PACKAGE_DIR)/yadm-no-retrieve
 	# Copy yadm script to Stow directory
-	mkdir -p $(STOW_DIR)/$(YADM_ARCHIVE_DIR)/bin && cp $< $@
+	mkdir -p $(STOW_DIR)/$(YADM_ARCHIVE_DIR)/bin && cp $(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm $@
 	# Allow execution of yadm script
 	chmod u+x $@
 	# Restrict access to yadm script
 	chmod g-rwx $@ && chmod o-rwx $@
 
+$(PACKAGE_DIR)/yadm-no-retrieve:
+	$(MAKE) $(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm
+	touch $@
+
 $(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm: $(PACKAGE_DIR)/$(YADM_ARCHIVE)
 	# Uncompress yadm archive
-	tar xvzf $< -C $(PACKAGE_DIR) --touch
+	tar xvzf $< -C $(PACKAGE_DIR)
 
 $(PACKAGE_DIR)/$(YADM_ARCHIVE):
 	# Download yadm version $(YADM_VERSION)
