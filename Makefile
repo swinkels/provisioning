@@ -656,7 +656,7 @@ $(PACKAGE_DIR)/$(ZSH_ARCHIVE_DIR)/Src/zsh: | $(PACKAGE_DIR)/$(ZSH_ARCHIVE_DIR)
 
 $(PACKAGE_DIR)/$(ZSH_ARCHIVE_DIR): $(PACKAGE_DIR)/$(ZSH_ARCHIVE)
 	# Uncompress zsh source package
-	tar xJf $< -C $(PACKAGE_DIR)
+	tar xzf $< -C $(PACKAGE_DIR)
 
 $(PACKAGE_DIR)/$(ZSH_ARCHIVE):
 	# Download zsh source package to the packages directory
