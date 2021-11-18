@@ -1,0 +1,36 @@
+# -*- mode: Makefile -*-
+# -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
+
+# * Main variables
+
+HOSTNAME=$(shell hostname)
+
+ifeq ($(STOW_DIR),)
+export STOW_DIR=$(HOME)/.local/stow
+endif
+
+LOCAL_FONTS_DIR=$(HOME)/.local/share/fonts
+LOCAL_GITHUB_REPOS_DIR=$(HOME)/repos/github.com
+GIT_REPOS_DIR=$(HOME)/repos/git
+
+# the following line to find the directory of this Makefile is from here:
+# https://stackoverflow.com/a/23324703
+MAKEFILE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+
+PACKAGE_DIR=$(MAKEFILE_DIR)/packages
+
+CONFIGURE_OPTIONS=CPPFLAGS=-I$(HOME)/.local/include LDFLAGS="-L$(HOME)/.local/lib -Wl,-rpath,$(HOME)/.local/lib"
+
+WGET_OPTIONS=--directory-prefix=$(PACKAGE_DIR) --quiet --timestamping
+
+# ~configure~ looks at the path of environment variable ~PKG_CONFIG_PATH~ to
+# determine which libraries are available. As we install some libraries locally,
+# we set it accordingly.
+
+export PKG_CONFIG_PATH:=$(HOME)/.local/lib/pkgconfig:$(PKG_CONFIG_PATH)
+
+# * Targets
+
+$(PACKAGE_DIR):
+	# Create directory to download and build packages
+	mkdir -p $@

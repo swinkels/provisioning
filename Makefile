@@ -1,26 +1,8 @@
 # -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
 
-# * Main variables
+# * Includes
 
-HOSTNAME=$(shell hostname)
-
-ifeq ($(STOW_DIR),)
-export STOW_DIR=$(HOME)/.local/stow
-endif
-
-LOCAL_FONTS_DIR=$(HOME)/.local/share/fonts
-LOCAL_GITHUB_REPOS_DIR=$(HOME)/repos/github.com
-GIT_REPOS_DIR=$(HOME)/repos/git
-
-# the following line to find the directory of this Makefile is from here:
-# https://stackoverflow.com/a/23324703
-MAKEFILE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-
-PACKAGE_DIR=$(MAKEFILE_DIR)/packages
-
-CONFIGURE_OPTIONS=CPPFLAGS=-I$(HOME)/.local/include LDFLAGS="-L$(HOME)/.local/lib -Wl,-rpath,$(HOME)/.local/lib"
-
-WGET_OPTIONS=--directory-prefix=$(PACKAGE_DIR) --quiet --timestamping
+include Makefile.shared
 
 # * Default target
 
@@ -51,10 +33,6 @@ no-target:
 nunhems: stow git yadm keychain zsh fzf restic ripgrep tmux pipx $(HOME)/.emacs.d $(HOME)/.spacemacs.d pyls
 
 	# The following packages should be available: $^
-
-$(PACKAGE_DIR):
-	# Create directory to download and build packages
-	mkdir -p $@
 
 # * Application installation & configuration
 
@@ -201,70 +179,13 @@ $(PACKAGE_DIR)/$(CMAKE_ARCHIVE):
 
 # ** curl
 
-.PHONY: curl curl-uninstall install-curl-to-stow
+.PHONY: curl curl-uninstall
 
-CURL_VERSION=7.75.0
-CURL_NAME_VERSION=curl-$(CURL_VERSION)
-CURL_STOW_DIR=$(STOW_DIR)/$(CURL_NAME_VERSION)
-CURL_ARCHIVE_DIR=$(PACKAGE_DIR)/curl-$(CURL_VERSION)
-CURL_ARCHIVE=curl-$(CURL_VERSION).tar.gz
-
-curl: ~/.local/bin/curl
-
-# The next target is a symlink. Note that to compare modification times (of
-# target and prerequisites), ~make~ looks at the mtime of the /destination of
-# the symlink/. However it /does/ check whether the symlink exists so if the
-# symlink is not present, ~make~ executes the commands for that target.
-
-# In an earlier version, the prerequisite of the next target was
-# $(CURL_STOW_DIR). That directory has an mtime that is at least the mtime of
-# $(CURL_STOW_DIR)/bin/curl, which is the destination of the (target) symlink.
-# For all intents and purposes this meant that the target was always out-of-date
-# and the Stow command would always execute.
-
-~/.local/bin/curl: $(CURL_STOW_DIR)/bin/curl
-	# Install curl using Stow
-	stow $(CURL_NAME_VERSION)
+curl:
+	$(MAKE) -f Makefile.build --no-print-directory curl
 
 curl-uninstall:
-	# Uninstall curl using Stow
-	stow --delete $(CURL_NAME_VERSION) --target=$(HOME)/.local
-	# Delete curl from Stow directory
-	rm -rfI $(CURL_STOW_DIR)
-
-# The next target allows us to remove the files from $(PACKAGE_DIR) that are
-# required to build and install curl (to save disk space). A "make curl" will
-# only recreate curl-related files in $(PACKAGE_DIR) when
-# $(CURL_STOW_DIR)/bin/curl doesn't exist.
-
-$(CURL_STOW_DIR)/bin/curl:
-	@$(MAKE) --no-print-directory install-curl-to-stow
-
-# Don't let the name of the prerequisite of the next target fool you. It refers
-# to the curl binary that will be build.
-
-install-curl-to-stow: $(CURL_ARCHIVE_DIR)/src/curl
-	# Install curl to Stow directory
-	cd $(CURL_ARCHIVE_DIR) && make install
-
-$(CURL_ARCHIVE_DIR)/src/curl: $(CURL_ARCHIVE_DIR)/configure
-	# Configure curl build
-	cd $(CURL_ARCHIVE_DIR) && ./configure $(CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(CURL_NAME_VERSION)
-	# Build curl
-	cd $(CURL_ARCHIVE_DIR) && make
-
-# The next target also updates the timestamp of the target file, which is one of
-# the uncompressed files. In this way the archive is only uncompressed once as
-# the timestamp of the archive is older.
-
-$(CURL_ARCHIVE_DIR)/configure: $(PACKAGE_DIR)/$(CURL_ARCHIVE)
-	# Uncompress curl source package
-	tar xzf $< -C $(PACKAGE_DIR)
-	@touch $@
-
-$(PACKAGE_DIR)/$(CURL_ARCHIVE): $(PACKAGE_DIR)
-	# Download curl version $(CURL_VERSION)
-	wget $(WGET_OPTIONS) https://curl.se/download/$(CURL_ARCHIVE)
+	$(MAKE) -f Makefile.build --no-print-directory curl-uninstall
 
 # ** fzf
 
