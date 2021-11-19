@@ -17,7 +17,7 @@ GIT_REPOS_DIR=$(HOME)/repos/git
 # https://stackoverflow.com/a/23324703
 MAKEFILE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
-PACKAGE_DIR=$(MAKEFILE_DIR)/packages
+WORKBENCH_PATH=$(HOME)/tmp/packages-workbench
 
 CONFIGURE_OPTIONS=CPPFLAGS=-I$(HOME)/.local/include LDFLAGS="-L$(HOME)/.local/lib -Wl,-rpath,$(HOME)/.local/lib"
 
@@ -31,6 +31,10 @@ export PKG_CONFIG_PATH:=$(HOME)/.local/lib/pkgconfig:$(PKG_CONFIG_PATH)
 
 # * Targets
 
-$(PACKAGE_DIR):
+$(WORKBENCH_PATH):
 	# Create directory to download and build packages
 	mkdir -p $@
+
+# * Deprecated
+
+PACKAGE_DIR=$(WORKBENCH_PATH)

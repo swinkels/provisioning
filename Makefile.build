@@ -60,10 +60,10 @@ $(PACKAGE)-uninstall:
 	# Delete $(PACKAGE) from Stow directory
 	rm -rfI $(PACKAGE_STOW_DIR)
 
-# The next target allows us to remove the files from $(PACKAGE_DIR) that are
-# required to build and install $(PACKAGE) (to save disk space). A "make $(PACKAGE)" will
-# only recreate $(PACKAGE)-related files in $(PACKAGE_DIR) when
-# $(PACKAGE_STOW_DIR)/$(LOCAL_TARGET_PATH) doesn't exist.
+# The next target allows us to remove the files from $(WORKBENCH_PATH) that are
+# required to build and install $(PACKAGE) (to save disk space). A "make
+# $(PACKAGE)" will only recreate $(PACKAGE)-related files in $(WORKBENCH_PATH)
+# when $(PACKAGE_STOW_DIR)/$(LOCAL_TARGET_PATH) doesn't exist.
 
 $(PACKAGE_STOW_DIR)/$(LOCAL_TARGET_PATH):
 	@$(MAKE) -f Makefile.build --no-print-directory install-$(PACKAGE)-to-stow
@@ -82,11 +82,11 @@ $(PACKAGE_ARCHIVE_DIR)/$(ARCHIVE_TARGET_PATH): $(PACKAGE_ARCHIVE_DIR)/configure
 # the uncompressed files. In this way the archive is only uncompressed once as
 # the timestamp of the archive is older.
 
-$(PACKAGE_ARCHIVE_DIR)/configure: $(PACKAGE_DIR)/$(PACKAGE_ARCHIVE)
+$(PACKAGE_ARCHIVE_DIR)/configure: $(WORKBENCH_PATH)/$(PACKAGE_ARCHIVE)
 	# Uncompress $(PACKAGE) source package
-	tar xzf $< -C $(PACKAGE_DIR)
+	tar xzf $< -C $(WORKBENCH_PATH)
 	@touch $@
 
-$(PACKAGE_DIR)/$(PACKAGE_ARCHIVE): | $(PACKAGE_DIR)
+$(WORKBENCH_PATH)/$(PACKAGE_ARCHIVE): | $(WORKBENCH_PATH)
 	# Download $(PACKAGE) version $(PACKAGE_VERSION)
 	wget $(WGET_OPTIONS) $(PACKAGE_URL)
