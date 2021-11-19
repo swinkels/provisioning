@@ -115,37 +115,17 @@ $(PACKAGE_DIR)/$(JANSSON_ARCHIVE):
 
 # ** git
 
-.PHONY: git
-
-GIT_VERSION=2.30.1
-GIT_ARCHIVE_DIR=git-$(GIT_VERSION)
-GIT_ARCHIVE=v$(GIT_VERSION).tar.gz
-
-git: curl ~/.local/bin/git
+.PHONY: git git-uninstall
 
 # You need to compile git with curl-devel present, otherwise it cannot use the
 # "remote helper for https" (https://stackoverflow.com/a/13018777) To install
 # curl-devel from source, you compile and install the curl source package.
 
-~/.local/bin/git: $(STOW_DIR)/$(GIT_ARCHIVE_DIR)/bin/git
-	# Install git using Stow
-	[ -L $@ ] && [ -e $@ ] || stow $(GIT_ARCHIVE_DIR)
+git: curl
+	$(MAKE) -f Makefile.build --no-print-directory git
 
-$(STOW_DIR)/$(GIT_ARCHIVE_DIR)/bin/git: $(PACKAGE_DIR)/$(GIT_ARCHIVE_DIR)/git
-	# Install git to Stow directory
-	cd $(PACKAGE_DIR)/$(GIT_ARCHIVE_DIR) && make install
-
-$(PACKAGE_DIR)/$(GIT_ARCHIVE_DIR)/git: | $(PACKAGE_DIR)/git-$(GIT_VERSION)
-	# Build git from source
-	cd $| && autoconf && ./configure $(CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(GIT_ARCHIVE_DIR) && make
-
-$(PACKAGE_DIR)/git-$(GIT_VERSION): $(PACKAGE_DIR)/$(GIT_ARCHIVE)
-	# Uncompress git source package
-	tar xzf $< -C $(PACKAGE_DIR)
-
-$(PACKAGE_DIR)/$(GIT_ARCHIVE):
-	# Download git source package to the packages directory
-	wget $(WGET_OPTIONS) https://github.com/git/git/archive/$(GIT_ARCHIVE)
+git-uninstall:
+	$(MAKE) -f Makefile.build --no-print-directory git-uninstall
 
 # ** cmake
 

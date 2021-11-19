@@ -3,7 +3,7 @@
 
 # * Includes and main variables
 
-AVAILABLE_PACKAGES=curl
+AVAILABLE_PACKAGES=curl git
 
 include Makefile.shared
 
@@ -11,14 +11,14 @@ ifneq ($(words $(MAKECMDGOALS)), 1)
 $(error Exactly one target should be passed to Makefile.build)
 endif
 
-PACKAGE=$(foreach PKG,$(AVAILABLE_PACKAGES),$(findstring $(PKG),$(MAKECMDGOALS)))
-
-ifneq ($(words $(PACKAGE)),1)
-$(error The target passed to Makefile.build should refer to a single package)
-endif
+PACKAGE=$(strip $(foreach PKG,$(AVAILABLE_PACKAGES),$(findstring $(PKG),$(MAKECMDGOALS))))
 
 ifeq ($(PACKAGE),)
 $(error The target passed to Makefile.build should refer to a package)
+endif
+
+ifneq ($(words $(PACKAGE)),1)
+$(error The target passed to Makefile.build should refer to a single package)
 endif
 
 include Makefile.$(PACKAGE)
