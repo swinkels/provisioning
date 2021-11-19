@@ -1,0 +1,16 @@
+# -*- mode: Makefile -*-
+# -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
+
+PACKAGE_VERSION=7.75.0
+PACKAGE_NAME_VERSION=curl-$(PACKAGE_VERSION)
+PACKAGE_STOW_DIR=$(STOW_DIR)/$(PACKAGE_NAME_VERSION)
+PACKAGE_ARCHIVE_DIR=$(PACKAGE_DIR)/curl-$(PACKAGE_VERSION)
+PACKAGE_ARCHIVE=curl-$(PACKAGE_VERSION).tar.gz
+PACKAGE_URL=https://curl.se/download
+
+LOCAL_TARGET_PATH=bin/curl
+
+# Don't let the name of the target in the uncompressed archive fool you. It
+# refers to the curl binary that will be build.
+
+ARCHIVE_TARGET_PATH=src/curl
