@@ -3,6 +3,7 @@
 # * Includes
 
 include Makefile.shared
+include Makefile.packages
 
 # * Default target
 
@@ -35,6 +36,16 @@ nunhems: stow git yadm keychain zsh fzf restic ripgrep tmux pipx $(HOME)/.emacs.
 	# The following packages should be available: $^
 
 # * Application installation & configuration
+
+.PHONY: $(AVAILABLE_PACKAGES) $(AVAILABLE_PACKAGES:%=%-uninstall)
+
+$(PACKAGE_DEPENDENCIES)
+
+$(AVAILABLE_PACKAGES): %:
+	$(MAKE) -f Makefile.build --no-print-directory $@
+
+$(AVAILABLE_PACKAGES:%=%-uninstall): %:
+	$(MAKE) -f Makefile.build --no-print-directory $@
 
 # ** emacs
 
@@ -113,20 +124,6 @@ $(PACKAGE_DIR)/$(JANSSON_ARCHIVE):
 	# Download jansson source package to the packages directory
 	wget $(WGET_OPTIONS) http://digip.org/jansson/releases/$(JANSSON_ARCHIVE)
 
-# ** git
-
-.PHONY: git git-uninstall
-
-# You need to compile git with curl-devel present, otherwise it cannot use the
-# "remote helper for https" (https://stackoverflow.com/a/13018777) To install
-# curl-devel from source, you compile and install the curl source package.
-
-git: curl
-	$(MAKE) -f Makefile.build --no-print-directory git
-
-git-uninstall:
-	$(MAKE) -f Makefile.build --no-print-directory git-uninstall
-
 # ** cmake
 
 .PHONY: cmake
@@ -156,16 +153,6 @@ $(PACKAGE_DIR)/$(CMAKE_ARCHIVE_DIR): $(PACKAGE_DIR)/$(CMAKE_ARCHIVE)
 $(PACKAGE_DIR)/$(CMAKE_ARCHIVE):
 	# Download cmake source package to the packages directory
 	wget $(WGET_OPTIONS) https://github.com/Kitware/CMake/releases/download/v$(CMAKE_VERSION)/$(CMAKE_ARCHIVE)
-
-# ** curl
-
-.PHONY: curl curl-uninstall
-
-curl:
-	$(MAKE) -f Makefile.build --no-print-directory curl
-
-curl-uninstall:
-	$(MAKE) -f Makefile.build --no-print-directory curl-uninstall
 
 # ** fzf
 

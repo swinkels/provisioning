@@ -3,9 +3,8 @@
 
 # * Includes
 
-AVAILABLE_PACKAGES=curl git
-
 include Makefile.shared
+include Makefile.packages
 
 # Determine which package to build from the targets passed to the current call
 # to make. The current call aborts if no target or more than 1 target is passed
@@ -29,7 +28,7 @@ endif
 
 include Makefile.$(PACKAGE)
 
-# * Target to build
+# * Additional variables
 
 PACKAGE_NAME_VERSION=$(PACKAGE)-$(PACKAGE_VERSION)
 
@@ -44,6 +43,8 @@ PACKAGE_ARCHIVE_PATH=$(WORKBENCH_PATH)/$(PACKAGE_ARCHIVE_DIR)
 
 # path to the main binary, script etc. in the uncompressed archive
 PACKAGE_ARCHIVE_TARGET_PATH=$(PACKAGE_ARCHIVE_PATH)/$(PACKAGE_ARCHIVE_TARGET)
+
+# * Installation targets
 
 .PHONY: $(PACKAGE) $(PACKAGE)-uninstall install-$(PACKAGE)-to-stow
 
