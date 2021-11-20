@@ -1,11 +1,15 @@
 # -*- mode: Makefile -*-
 # -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
 
-# * Includes and main variables
+# * Includes
 
 AVAILABLE_PACKAGES=curl git
 
 include Makefile.shared
+
+# Determine which package to build from the targets passed to the current call
+# to make. The current call aborts if no target or more than 1 target is passed
+# or the target does not refer to an available package.
 
 ifneq ($(words $(MAKECMDGOALS)), 1)
 $(error Exactly one target should be passed to Makefile.build)
@@ -21,19 +25,29 @@ ifneq ($(words $(PACKAGE)),1)
 $(error The target passed to Makefile.build should refer to a single package)
 endif
 
+# Include the Makefile for the specified package.
+
 include Makefile.$(PACKAGE)
 
 # * Target to build
 
 PACKAGE_NAME_VERSION=$(PACKAGE)-$(PACKAGE_VERSION)
 
-PACKAGE_STOW_DIR=$(STOW_DIR)/$(PACKAGE_NAME_VERSION)
+# path to install the package in
+PACKAGE_STOW_PATH=$(STOW_DIR)/$(PACKAGE_NAME_VERSION)
 
+# name of the archive to download
 PACKAGE_ARCHIVE=$(notdir $(PACKAGE_URL))
+
+# path to the root directory of the uncompressed archive
+PACKAGE_ARCHIVE_PATH=$(WORKBENCH_PATH)/$(PACKAGE_ARCHIVE_DIR)
+
+# path to the main binary, script etc. in the uncompressed archive
+PACKAGE_ARCHIVE_TARGET_PATH=$(PACKAGE_ARCHIVE_PATH)/$(PACKAGE_ARCHIVE_TARGET)
 
 .PHONY: $(PACKAGE) $(PACKAGE)-uninstall install-$(PACKAGE)-to-stow
 
-$(PACKAGE): ~/.local/$(LOCAL_TARGET_PATH)
+$(PACKAGE): ~/.local/$(PACKAGE_STOW_TARGET)
 
 # The next target is a symlink. Note that to compare modification times (of
 # target and prerequisites), ~make~ looks at the mtime of the /destination of
@@ -41,12 +55,11 @@ $(PACKAGE): ~/.local/$(LOCAL_TARGET_PATH)
 # symlink is not present, ~make~ executes the commands for that target.
 
 # In an earlier version, the prerequisite of the next target was
-# $(PACKAGE_STOW_DIR). That directory has an mtime that is at least the mtime of
-# $(PACKAGE_STOW_DIR)/$(LOCAL_TARGET_PATH), which is the destination of the
-# (target) symlink. For all intents and purposes this meant that the target was
-# always out-of-date and the Stow command would always execute.
+# $(PACKAGE_STOW_PATH). That directory has an mtime that is at least the mtime
+# of the (target) symlink. For all intents and purposes this meant that the
+# target was always out-of-date and the Stow command would always execute.
 
-~/.local/$(LOCAL_TARGET_PATH): $(PACKAGE_STOW_DIR)/$(LOCAL_TARGET_PATH)
+~/.local/$(PACKAGE_STOW_TARGET): $(PACKAGE_STOW_PATH)/$(PACKAGE_STOW_TARGET)
 	# Install $(PACKAGE) using Stow
 	stow $(PACKAGE_NAME_VERSION)
 
@@ -58,31 +71,31 @@ $(PACKAGE)-uninstall:
 	# Uninstall $(PACKAGE) using Stow
 	stow --delete $(PACKAGE_NAME_VERSION) --target=$(HOME)/.local
 	# Delete $(PACKAGE) from Stow directory
-	rm -rfI $(PACKAGE_STOW_DIR)
+	rm -rfI $(PACKAGE_STOW_PATH)
 
-# The next target allows us to remove the files from $(WORKBENCH_PATH) that are
+# The next target allows us to remove the files in $(WORKBENCH_PATH) that are
 # required to build and install $(PACKAGE) (to save disk space). A "make
 # $(PACKAGE)" will only recreate $(PACKAGE)-related files in $(WORKBENCH_PATH)
-# when $(PACKAGE_STOW_DIR)/$(LOCAL_TARGET_PATH) doesn't exist.
+# when $(PACKAGE_STOW_PATH)/$(PACKAGE_STOW_TARGET) doesn't exist.
 
-$(PACKAGE_STOW_DIR)/$(LOCAL_TARGET_PATH):
+$(PACKAGE_STOW_PATH)/$(PACKAGE_STOW_TARGET):
 	@$(MAKE) -f Makefile.build --no-print-directory install-$(PACKAGE)-to-stow
 
-install-$(PACKAGE)-to-stow: $(PACKAGE_ARCHIVE_DIR)/$(ARCHIVE_TARGET_PATH)
+install-$(PACKAGE)-to-stow: $(PACKAGE_ARCHIVE_TARGET_PATH)
 	# Install $(PACKAGE) to Stow directory
-	cd $(PACKAGE_ARCHIVE_DIR) && make install
+	cd $(PACKAGE_ARCHIVE_PATH) && make install
 
-$(PACKAGE_ARCHIVE_DIR)/$(ARCHIVE_TARGET_PATH): $(PACKAGE_ARCHIVE_DIR)/configure
+$(PACKAGE_ARCHIVE_TARGET_PATH): $(PACKAGE_ARCHIVE_PATH)/configure
 	# Configure $(PACKAGE) build
-	cd $(PACKAGE_ARCHIVE_DIR) && ./configure $(CONFIGURE_OPTIONS) --prefix=$(PACKAGE_STOW_DIR)
+	cd $(PACKAGE_ARCHIVE_PATH) && ./configure $(CONFIGURE_OPTIONS) --prefix=$(PACKAGE_STOW_PATH)
 	# Build $(PACKAGE)
-	cd $(PACKAGE_ARCHIVE_DIR) && make
+	cd $(PACKAGE_ARCHIVE_PATH) && make
 
 # The next target also updates the timestamp of the target file, which is one of
 # the uncompressed files. In this way the archive is only uncompressed once as
 # the timestamp of the archive is older.
 
-$(PACKAGE_ARCHIVE_DIR)/configure: $(WORKBENCH_PATH)/$(PACKAGE_ARCHIVE)
+$(PACKAGE_ARCHIVE_PATH)/configure: $(WORKBENCH_PATH)/$(PACKAGE_ARCHIVE)
 	# Uncompress $(PACKAGE) source package
 	tar xzf $< -C $(WORKBENCH_PATH)
 	@touch $@

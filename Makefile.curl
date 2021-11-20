@@ -1,13 +1,20 @@
 # -*- mode: Makefile -*-
 # -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
 
+# This file defines the variables needed to retrieve, build and install curl.
+
 PACKAGE_VERSION=7.75.0
 PACKAGE_URL=https://curl.se/download/curl-$(PACKAGE_VERSION).tar.gz
-PACKAGE_ARCHIVE_DIR=$(PACKAGE_DIR)/curl-$(PACKAGE_VERSION)
 
-LOCAL_TARGET_PATH=bin/curl
+# root directory of the uncompressed archive
+PACKAGE_ARCHIVE_DIR=curl-$(PACKAGE_VERSION)
 
-# Don't let the name of the target in the uncompressed archive fool you. It
-# refers to the curl binary that will be build.
+# relative path to the main binary, script etc. in the uncompressed archive
+PACKAGE_ARCHIVE_TARGET=$(PACKAGE_ARCHIVE_DIR)/src/curl
 
-ARCHIVE_TARGET_PATH=src/curl
+# About ~src/curl~, don't let the name of the target in the uncompressed
+# archive fool you. It refers to the curl binary to build.
+
+# relative path to the main binary, script etc. in the Stow subdirectory that
+# will contain the installed package
+PACKAGE_STOW_TARGET=bin/curl

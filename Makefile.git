@@ -2,8 +2,7 @@
 # -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
 
 PACKAGE_VERSION=2.30.1
-PACKAGE_URL=https://mirrors.edge.kernel.org/pub/software/scm/git
-PACKAGE_ARCHIVE_DIR=$(PACKAGE_DIR)/git-$(PACKAGE_VERSION)
-
-LOCAL_TARGET_PATH=bin/git
-ARCHIVE_TARGET_PATH=git
+PACKAGE_URL=https://mirrors.edge.kernel.org/pub/software/scm/git/git-$(PACKAGE_VERSION).tar.gz
+PACKAGE_ARCHIVE_DIR=git-$(PACKAGE_VERSION)
+PACKAGE_ARCHIVE_TARGET=git
+PACKAGE_STOW_TARGET=bin/git
