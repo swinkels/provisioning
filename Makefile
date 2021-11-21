@@ -49,7 +49,7 @@ $(AVAILABLE_PACKAGES:%=%-uninstall): %:
 
 # ** emacs
 
-.PHONY: emacs jansson
+.PHONY: emacs
 
 # Emacs 27.x (and newer) has "natively compiled" support for handling JSON data.
 # This means that it can handle JSON via the much quicker C library ~jansson~
@@ -97,32 +97,6 @@ $(PACKAGE_DIR)/$(EMACS_ARCHIVE_DIR): $(PACKAGE_DIR)/$(EMACS_ARCHIVE)
 $(PACKAGE_DIR)/$(EMACS_ARCHIVE):
 	# Download Emacs source package to the packages directory
 	wget $(WGET_OPTIONS) http://ftp.snt.utwente.nl/pub/software/gnu/emacs/$(EMACS_ARCHIVE)
-
-JANSSON_VERSION=2.13
-JANSSON_ARCHIVE_DIR=jansson-$(JANSSON_VERSION)
-JANSSON_ARCHIVE=$(JANSSON_ARCHIVE_DIR).tar.gz
-
-jansson: ~/.local/lib/libjansson.so
-
-~/.local/lib/libjansson.so: $(STOW_DIR)/$(JANSSON_ARCHIVE_DIR)/lib/libjansson.so
-	# Install jansson using Stow
-	[ -L $@ ] && [ -e $@ ] || stow $(JANSSON_ARCHIVE_DIR)
-
-$(STOW_DIR)/$(JANSSON_ARCHIVE_DIR)/lib/libjansson.so: $(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR)/src/.libs/libjansson.so
-	# Install jansson to Stow directory
-	cd $(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR) && make install
-
-$(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR)/src/.libs/libjansson.so: | $(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR)
-	# Build jansson from source
-	cd $| && ./configure $(CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(JANSSON_ARCHIVE_DIR) && make
-
-$(PACKAGE_DIR)/$(JANSSON_ARCHIVE_DIR): $(PACKAGE_DIR)/$(JANSSON_ARCHIVE)
-	# Uncompress jansson source package
-	tar xzf $< -C $(PACKAGE_DIR)
-
-$(PACKAGE_DIR)/$(JANSSON_ARCHIVE):
-	# Download jansson source package to the packages directory
-	wget $(WGET_OPTIONS) http://digip.org/jansson/releases/$(JANSSON_ARCHIVE)
 
 # ** cmake
 
