@@ -1,0 +1,10 @@
+# -*- mode: Makefile -*-
+# -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
+
+install-$(PACKAGE)-to-stow: $(WORKBENCH_PATH)/$(PACKAGE_ARCHIVE)
+	# Create directory to contain main binary, script etc. in Stow subdirectory
+	mkdir -p $(PACKAGE_STOW_PATH)/$(dir $(PACKAGE_STOW_TARGET))
+	# Install $(PACKAGE) to Stow subdirectory
+	cp $(PACKAGE_ARCHIVE_TARGET_PATH) $(PACKAGE_STOW_PATH)/$(PACKAGE_STOW_TARGET)
+	# Allow execution of main binary, script etc.
+	chmod u+x $(PACKAGE_STOW_PATH)/$(PACKAGE_STOW_TARGET)

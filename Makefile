@@ -390,32 +390,6 @@ $(PACKAGE_DIR)/$(STOW_ARCHIVE):
 	# Download stow source package to the packages directory
 	wget $(WGET_OPTIONS) https://ftp.gnu.org/gnu/stow/$(STOW_ARCHIVE)
 
-# ** tmux
-
-.PHONY: tmux
-
-TMUX_VERSION=3.1b
-TMUX_ARCHIVE_DIR=tmux-$(TMUX_VERSION)
-TMUX_APP_IMAGE=tmux-$(TMUX_VERSION)-x86_64.AppImage
-
-tmux: ~/.local/bin/tmux
-
-~/.local/bin/tmux: $(STOW_DIR)/$(TMUX_ARCHIVE_DIR)/bin/tmux
-	# Install tmux using Stow
-	stow $(TMUX_ARCHIVE_DIR) && touch $@
-
-$(STOW_DIR)/$(TMUX_ARCHIVE_DIR)/bin/tmux: $(PACKAGE_DIR)/$(TMUX_APP_IMAGE)
-	# Copy tmux AppImage to Stow directory
-	mkdir -p $(STOW_DIR)/$(TMUX_ARCHIVE_DIR)/bin && cp $< $@
-	# Allow execution of tmux AppImage
-	chmod u+x $@
-	# Restrict access to tmux AppImage
-	chmod g-wx $@ && chmod o-wx $@
-
-$(PACKAGE_DIR)/$(TMUX_APP_IMAGE):
-	# Download tmux version $(TMUX_VERSION)
-	wget $(WGET_OPTIONS) https://github.com/tmux/tmux/releases/download/$(TMUX_VERSION)/$(TMUX_APP_IMAGE)
-
 # ** yadm
 
 .PHONY: yadm
