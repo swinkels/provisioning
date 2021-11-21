@@ -3,6 +3,7 @@
 
 PACKAGE_VERSION=2.13
 PACKAGE_URL=http://digip.org/jansson/releases/jansson-$(PACKAGE_VERSION).tar.gz
+PACKAGE_TYPE=configure
 PACKAGE_ARCHIVE_DIR=jansson-$(PACKAGE_VERSION)
 PACKAGE_ARCHIVE_TARGET=src/.libs/libjansson.so
 PACKAGE_STOW_TARGET=lib/libjansson.so

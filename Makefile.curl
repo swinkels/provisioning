@@ -6,6 +6,12 @@
 PACKAGE_VERSION=7.75.0
 PACKAGE_URL=https://curl.se/download/curl-$(PACKAGE_VERSION).tar.gz
 
+# specifies steps to install downloaded archive to the Stow subdirectory:
+#
+# configure
+#   extract, configure, make & make install
+PACKAGE_TYPE=configure
+
 # root directory of the uncompressed archive
 PACKAGE_ARCHIVE_DIR=curl-$(PACKAGE_VERSION)
 

@@ -82,24 +82,7 @@ $(PACKAGE)-uninstall:
 $(PACKAGE_STOW_PATH)/$(PACKAGE_STOW_TARGET):
 	@$(MAKE) -f Makefile.build --no-print-directory install-$(PACKAGE)-to-stow
 
-install-$(PACKAGE)-to-stow: $(PACKAGE_ARCHIVE_TARGET_PATH)
-	# Install $(PACKAGE) to Stow directory
-	cd $(PACKAGE_ARCHIVE_PATH) && make install
-
-$(PACKAGE_ARCHIVE_TARGET_PATH): $(PACKAGE_ARCHIVE_PATH)/configure
-	# Configure $(PACKAGE) build
-	cd $(PACKAGE_ARCHIVE_PATH) && ./configure $(CONFIGURE_OPTIONS) --prefix=$(PACKAGE_STOW_PATH)
-	# Build $(PACKAGE)
-	cd $(PACKAGE_ARCHIVE_PATH) && make
-
-# The next target also updates the timestamp of the target file, which is one of
-# the uncompressed files. In this way the archive is only uncompressed once as
-# the timestamp of the archive is older.
-
-$(PACKAGE_ARCHIVE_PATH)/configure: $(WORKBENCH_PATH)/$(PACKAGE_ARCHIVE)
-	# Uncompress $(PACKAGE) source package
-	tar xzf $< -C $(WORKBENCH_PATH)
-	@touch $@
+include Makefile.$(PACKAGE_TYPE)
 
 $(WORKBENCH_PATH)/$(PACKAGE_ARCHIVE): | $(WORKBENCH_PATH)
 	# Download $(PACKAGE) version $(PACKAGE_VERSION)
