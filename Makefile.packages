@@ -4,8 +4,9 @@
 AVAILABLE_PACKAGES=curl git
 
 # multiline value that specifies dependencies between top-level targets
-PACKAGE_DEPENDENCIES=\
+define PACKAGE_DEPENDENCIES
 git: curl
+endef
 
 # You need to compile git with curl-devel present, otherwise it cannot use the
 # "remote helper for https" (https://stackoverflow.com/a/13018777) To install
