@@ -2,7 +2,7 @@
 # -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
 
 install-$(PACKAGE)-to-stow: $(PACKAGE_ARCHIVE_TARGET_PATH)
-	# Install $(PACKAGE) to Stow directory
+	# Install $(PACKAGE) to Stow subdirectory
 	cd $(PACKAGE_ARCHIVE_PATH) && make install
 
 $(PACKAGE_ARCHIVE_TARGET_PATH): $(PACKAGE_ARCHIVE_PATH)/configure
