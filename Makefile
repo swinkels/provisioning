@@ -307,37 +307,6 @@ $(PACKAGE_DIR)/$(RESTIC_ARCHIVE):
 	# Download restic version $(RESTIC_VERSION)
 	wget $(WGET_OPTIONS) https://github.com/restic/restic/releases/download/v$(RESTIC_VERSION)/$(RESTIC_ARCHIVE)
 
-# ** ripgrep
-
-.PHONY: ripgrep
-
-RIPGREP_VERSION=12.1.1
-RIPGREP_NAME_VERSION=ripgrep-$(RIPGREP_VERSION)
-RIPGREP_ARCHIVE_DIR=$(RIPGREP_NAME_VERSION)-x86_64-unknown-linux-musl
-RIPGREP_ARCHIVE=$(RIPGREP_ARCHIVE_DIR).tar.gz
-
-ripgrep: ~/.local/bin/rg
-
-~/.local/bin/rg: $(STOW_DIR)/$(RIPGREP_NAME_VERSION)/bin/rg
-	# Install ripgrep using Stow
-	stow $(RIPGREP_NAME_VERSION) && touch $@
-
-$(STOW_DIR)/$(RIPGREP_NAME_VERSION)/bin/rg: $(PACKAGE_DIR)/$(RIPGREP_NAME_VERSION)-no-retrieve
-	# Copy ripgrep to Stow directory
-	mkdir -p $(STOW_DIR)/$(RIPGREP_NAME_VERSION)/bin && cp $< $@
-
-$(PACKAGE_DIR)/$(RIPGREP_NAME_VERSION)-no-retrieve:
-	@$(MAKE) --no-print-directory $(PACKAGE_DIR)/$(RIPGREP_ARCHIVE_DIR)/rg
-	@touch $@
-
-$(PACKAGE_DIR)/$(RIPGREP_ARCHIVE_DIR)/rg: $(PACKAGE_DIR)/$(RIPGREP_ARCHIVE)
-	# Uncompress ripgrep archive
-	tar xzf $< -C $(PACKAGE_DIR)
-
-$(PACKAGE_DIR)/$(RIPGREP_ARCHIVE):
-	# Download ripgrep version $(RIPGREP_VERSION)
-	wget $(WGET_OPTIONS) https://github.com/BurntSushi/ripgrep/releases/download/$(RIPGREP_VERSION)/$(RIPGREP_ARCHIVE)
-
 # ** spacemacs
 
 # Target ~spacemacs~ clones spacemacs and my spacemacs configuration to a custom

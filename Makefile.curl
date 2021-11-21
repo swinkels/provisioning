@@ -10,6 +10,8 @@ PACKAGE_URL=https://curl.se/download/curl-$(PACKAGE_VERSION).tar.gz
 #
 # configure
 #   extract, configure, make & make install
+# uncompress-copy
+#   uncompress archive and copy main binary, script etc. to the Stow subdirectory
 PACKAGE_TYPE=configure
 
 # root directory of the uncompressed archive

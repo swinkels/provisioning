@@ -1,0 +1,17 @@
+# -*- mode: Makefile -*-
+# -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
+
+install-$(PACKAGE)-to-stow: $(PACKAGE_ARCHIVE_TARGET_PATH)
+	# Create directory to contain main binary, script etc. in Stow subdirectory
+	mkdir -p $(PACKAGE_STOW_PATH)/$(dir $(PACKAGE_STOW_TARGET))
+	# Install $(PACKAGE) to Stow subdirectory
+	cp $(PACKAGE_ARCHIVE_TARGET_PATH) $(PACKAGE_STOW_PATH)/$(PACKAGE_STOW_TARGET)
+
+# The next target also updates the timestamp of the target file, which is one of
+# the uncompressed files. In this way the archive is only uncompressed once as
+# the timestamp of the archive is older.
+
+$(PACKAGE_ARCHIVE_TARGET_PATH): $(WORKBENCH_PATH)/$(PACKAGE_ARCHIVE)
+	# Uncompress $(PACKAGE) source package
+	tar xzf $< -C $(WORKBENCH_PATH)
+	@touch $@
