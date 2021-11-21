@@ -10,7 +10,7 @@ PACKAGE_URL=https://curl.se/download/curl-$(PACKAGE_VERSION).tar.gz
 PACKAGE_ARCHIVE_DIR=curl-$(PACKAGE_VERSION)
 
 # relative path to the main binary, script etc. in the uncompressed archive
-PACKAGE_ARCHIVE_TARGET=$(PACKAGE_ARCHIVE_DIR)/src/curl
+PACKAGE_ARCHIVE_TARGET=src/curl
 
 # About ~src/curl~, don't let the name of the target in the uncompressed
 # archive fool you. It refers to the curl binary to build.
