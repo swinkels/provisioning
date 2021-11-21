@@ -236,33 +236,6 @@ $(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE):
 	# Download libtool source package to the packages directory
 	wget $(WGET_OPTIONS) http://ftp.jaist.ac.jp/pub/GNU/libtool/$(LIBTOOL_ARCHIVE)
 
-# ** mob
-
-.PHONY: mob
-
-MOB_VERSION=2.1.0
-MOB_ARCHIVE_DIR=mob-$(MOB_VERSION)
-MOB_ARCHIVE=mob_v$(MOB_VERSION)_linux_amd64.tar.gz
-
-mob: ~/.local/bin/mob
-
-~/.local/bin/mob: $(STOW_DIR)/$(MOB_ARCHIVE_DIR)/bin/mob
-	# Install mob using Stow
-	stow $(MOB_ARCHIVE_DIR) && touch $@
-
-$(STOW_DIR)/$(MOB_ARCHIVE_DIR)/bin/mob: $(PACKAGE_DIR)/mob
-	# Copy mob binary to Stow directory
-	- mkdir -p $(STOW_DIR)/$(MOB_ARCHIVE_DIR)/bin
-	cp $< $@
-
-$(PACKAGE_DIR)/mob: $(PACKAGE_DIR)/$(MOB_ARCHIVE)
-	# Uncompress mob package
-	tar xzf $< -C $(PACKAGE_DIR) --touch
-
-$(PACKAGE_DIR)/$(MOB_ARCHIVE):
-	# Download mob source package to the packages directory
-	wget $(WGET_OPTIONS) https://github.com/remotemobprogramming/mob/releases/download/v$(MOB_VERSION)/$(MOB_ARCHIVE)
-
 # ** pipx
 
 ifeq ($(HOSTNAME), bioinformatics-dev.adpa6.local)

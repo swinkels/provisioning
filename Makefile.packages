@@ -1,7 +1,7 @@
 # -*- mode: Makefile -*-
 # -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
 
-AVAILABLE_PACKAGES=curl git jansson ripgrep
+AVAILABLE_PACKAGES=curl git jansson mob ripgrep
 
 # multiline value that specifies dependencies between top-level targets
 define PACKAGE_DEPENDENCIES
