@@ -1,0 +1,9 @@
+# -*- mode: Makefile -*-
+# -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
+
+PACKAGE_VERSION=2.4.6
+PACKAGE_URL=http://ftp.jaist.ac.jp/pub/GNU/libtool/libtool-$(PACKAGE_VERSION).tar.gz
+PACKAGE_TYPE=configure
+PACKAGE_ARCHIVE_DIR=libtool-$(PACKAGE_VERSION)
+PACKAGE_ARCHIVE_TARGET=libtool
+PACKAGE_STOW_TARGET=bin/libtool

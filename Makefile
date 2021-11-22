@@ -148,36 +148,6 @@ $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE):
 	# Download graphviz source package to the packages directory
 	wget $(WGET_OPTIONS) https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/$(GRAPHVIZ_VERSION)/$(GRAPHVIZ_ARCHIVE)
 
-# ** libtool
-
-.PHONY: libtool
-
-LIBTOOL_VERSION=2.4.6
-LIBTOOL_ARCHIVE_DIR=libtool-$(LIBTOOL_VERSION)
-LIBTOOL_ARCHIVE=$(LIBTOOL_ARCHIVE_DIR).tar.gz
-
-libtool: ~/.local/bin/libtool
-
-~/.local/bin/libtool: $(STOW_DIR)/$(LIBTOOL_ARCHIVE_DIR)/bin/libtool
-	# Install libtool using Stow
-	stow $(LIBTOOL_ARCHIVE_DIR) && touch $@
-
-$(STOW_DIR)/$(LIBTOOL_ARCHIVE_DIR)/bin/libtool: $(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE_DIR)/libtool
-	# Install libtool to Stow directory
-	cd $(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE_DIR) && make install
-
-$(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE_DIR)/libtool: | $(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE_DIR)
-	# Build libtool from source
-	cd $| && ./configure $(CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(LIBTOOL_ARCHIVE_DIR) && make
-
-$(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE_DIR): $(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE)
-	# Uncompress libtool source package
-	tar xzf $< -C $(PACKAGE_DIR)
-
-$(PACKAGE_DIR)/$(LIBTOOL_ARCHIVE):
-	# Download libtool source package to the packages directory
-	wget $(WGET_OPTIONS) http://ftp.jaist.ac.jp/pub/GNU/libtool/$(LIBTOOL_ARCHIVE)
-
 # ** pipx
 
 ifeq ($(HOSTNAME), bioinformatics-dev.adpa6.local)
