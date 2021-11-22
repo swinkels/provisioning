@@ -98,36 +98,6 @@ $(PACKAGE_DIR)/$(EMACS_ARCHIVE):
 	# Download Emacs source package to the packages directory
 	wget $(WGET_OPTIONS) http://ftp.snt.utwente.nl/pub/software/gnu/emacs/$(EMACS_ARCHIVE)
 
-# ** cmake
-
-.PHONY: cmake
-
-CMAKE_VERSION=3.20.0
-CMAKE_ARCHIVE_DIR=cmake-$(CMAKE_VERSION)
-CMAKE_ARCHIVE=$(CMAKE_ARCHIVE_DIR).tar.gz
-
-cmake: ~/.local/bin/cmake
-
-~/.local/bin/cmake: $(STOW_DIR)/$(CMAKE_ARCHIVE_DIR)/bin/cmake
-	# Install cmake using Stow
-	stow $(CMAKE_ARCHIVE_DIR) && touch $@
-
-$(STOW_DIR)/$(CMAKE_ARCHIVE_DIR)/bin/cmake: $(PACKAGE_DIR)/$(CMAKE_ARCHIVE_DIR)/bin/cmake
-	# Install cmake to Stow directory
-	cd $(PACKAGE_DIR)/$(CMAKE_ARCHIVE_DIR) && make install
-
-$(PACKAGE_DIR)/$(CMAKE_ARCHIVE_DIR)/bin/cmake: | $(PACKAGE_DIR)/$(CMAKE_ARCHIVE_DIR)
-	# Build cmake from source
-	cd $| && ./configure $(CONFIGURE_OPTIONS) --prefix=$(STOW_DIR)/$(CMAKE_ARCHIVE_DIR) && make
-
-$(PACKAGE_DIR)/$(CMAKE_ARCHIVE_DIR): $(PACKAGE_DIR)/$(CMAKE_ARCHIVE)
-	# Uncompress cmake source package
-	tar xzf $< -C $(PACKAGE_DIR)
-
-$(PACKAGE_DIR)/$(CMAKE_ARCHIVE):
-	# Download cmake source package to the packages directory
-	wget $(WGET_OPTIONS) https://github.com/Kitware/CMake/releases/download/v$(CMAKE_VERSION)/$(CMAKE_ARCHIVE)
-
 # ** fzf
 
 .PHONY: fzf
