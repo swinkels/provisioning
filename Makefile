@@ -178,34 +178,6 @@ $(PACKAGE_DIR)/$(GRAPHVIZ_ARCHIVE):
 	# Download graphviz source package to the packages directory
 	wget $(WGET_OPTIONS) https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/$(GRAPHVIZ_VERSION)/$(GRAPHVIZ_ARCHIVE)
 
-# ** keychain
-
-.PHONY: keychain
-
-KEYCHAIN_VERSION=2.8.5
-KEYCHAIN_ARCHIVE_DIR=keychain-$(KEYCHAIN_VERSION)
-KEYCHAIN_ARCHIVE=$(KEYCHAIN_VERSION).tar.gz
-
-keychain: ~/.local/bin/keychain
-
-~/.local/bin/keychain: $(STOW_DIR)/$(KEYCHAIN_ARCHIVE_DIR)/bin/keychain
-	# Install keychain using Stow
-	stow $(KEYCHAIN_ARCHIVE_DIR) && touch $@
-
-$(STOW_DIR)/$(KEYCHAIN_ARCHIVE_DIR)/bin/keychain: $(PACKAGE_DIR)/$(KEYCHAIN_ARCHIVE_DIR)/keychain
-	# Copy keychain script to Stow directory
-	mkdir -p $(STOW_DIR)/$(KEYCHAIN_ARCHIVE_DIR)/bin && cp $< $@
-	# Restrict access to main keychain script
-	chmod g-rwx $@ && chmod o-rwx $@
-
-$(PACKAGE_DIR)/$(KEYCHAIN_ARCHIVE_DIR)/keychain: $(PACKAGE_DIR)/$(KEYCHAIN_ARCHIVE)
-	# Uncompress keychain archive
-	tar xzf $< -C $(PACKAGE_DIR) --touch
-
-$(PACKAGE_DIR)/$(KEYCHAIN_ARCHIVE):
-	# Download keychain version $(KEYCHAIN_VERSION)
-	wget $(WGET_OPTIONS) https://github.com/funtoo/keychain/archive/$(KEYCHAIN_ARCHIVE)
-
 # ** libtool
 
 .PHONY: libtool

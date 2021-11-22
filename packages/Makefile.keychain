@@ -1,0 +1,11 @@
+# -*- mode: Makefile -*-
+# -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
+
+# This file defines the variables needed to retrieve, build and install curl.
+
+PACKAGE_VERSION=2.8.5
+PACKAGE_URL=https://github.com/funtoo/keychain/archive/$(PACKAGE_VERSION).tar.gz
+PACKAGE_TYPE=uncompress-copy
+PACKAGE_ARCHIVE_DIR=keychain-$(PACKAGE_VERSION)
+PACKAGE_ARCHIVE_TARGET=keychain
+PACKAGE_STOW_TARGET=bin/keychain
