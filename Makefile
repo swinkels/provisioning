@@ -3,7 +3,7 @@
 # * Includes
 
 include Makefile.shared
-include Makefile.packages
+include $(MAKEFILE_PATH)/packages/Makefile.packages
 
 # * Default target
 

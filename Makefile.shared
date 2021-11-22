@@ -15,7 +15,7 @@ GIT_REPOS_DIR=$(HOME)/repos/git
 
 # the following line to find the directory of this Makefile is from here:
 # https://stackoverflow.com/a/23324703
-MAKEFILE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+MAKEFILE_PATH=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 WORKBENCH_PATH=$(HOME)/tmp/packages-workbench
 

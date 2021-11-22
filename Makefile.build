@@ -4,7 +4,7 @@
 # * Includes
 
 include Makefile.shared
-include Makefile.packages
+include $(MAKEFILE_PATH)/packages/Makefile.packages
 
 # Determine which package to build from the targets passed to the current call
 # to make. The current call aborts if no target or more than 1 target is passed
@@ -26,7 +26,7 @@ endif
 
 # Include the Makefile for the specified package.
 
-include Makefile.$(PACKAGE)
+include $(MAKEFILE_PATH)/packages/Makefile.$(PACKAGE)
 
 # * Additional variables
 
