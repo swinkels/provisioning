@@ -33,7 +33,7 @@ export PKG_CONFIG_PATH:=$(HOME)/.local/lib/pkgconfig:$(PKG_CONFIG_PATH)
 # package. This allows us to easily support packages that almost fit the
 # standard mould, but not completely.
 
-PACKAGE_UNCOMPRESS_COMMAND=tar xzf $< -C $(WORKBENCH_PATH)
+PACKAGE_UNCOMPRESS_COMMAND=tar xzf $<
 
 # * Targets
 
