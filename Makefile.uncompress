@@ -7,5 +7,5 @@
 
 $(PACKAGE_ARCHIVE_PATH)/configure: $(WORKBENCH_PATH)/$(PACKAGE_ARCHIVE)
 	# Uncompress $(PACKAGE) source package
-	tar xzf $< -C $(WORKBENCH_PATH)
+	$(PACKAGE_UNCOMPRESS_COMMAND)
 	@touch $@

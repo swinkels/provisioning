@@ -29,6 +29,12 @@ WGET_OPTIONS=--directory-prefix=$(PACKAGE_DIR) --quiet --timestamping
 
 export PKG_CONFIG_PATH:=$(HOME)/.local/lib/pkgconfig:$(PKG_CONFIG_PATH)
 
+# The following variables can be overriden in each Makefile that configures a
+# package. This allows us to easily support packages that almost fit the
+# standard mould, but not completely.
+
+PACKAGE_UNCOMPRESS_COMMAND=tar xzf $< -C $(WORKBENCH_PATH)
+
 # * Targets
 
 $(WORKBENCH_PATH):
