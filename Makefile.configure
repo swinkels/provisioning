@@ -1,11 +1,13 @@
 # -*- mode: Makefile -*-
 # -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
 
+PACKAGE_ARCHIVE_UNCOMPRESSED_FILE=configure
+
 install-$(PACKAGE)-to-stow: $(PACKAGE_ARCHIVE_TARGET_PATH)
 	# Install $(PACKAGE) to Stow subdirectory
 	cd $(PACKAGE_ARCHIVE_PATH) && make install
 
-$(PACKAGE_ARCHIVE_TARGET_PATH): $(PACKAGE_ARCHIVE_PATH)/configure
+$(PACKAGE_ARCHIVE_TARGET_PATH): $(PACKAGE_ARCHIVE_PATH)/$(PACKAGE_ARCHIVE_UNCOMPRESSED_FILE)
 	# Configure $(PACKAGE) build
 	cd $(PACKAGE_ARCHIVE_PATH) && ./configure $(CONFIGURE_OPTIONS) --prefix=$(PACKAGE_STOW_PATH)
 	# Build $(PACKAGE)

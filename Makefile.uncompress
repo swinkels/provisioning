@@ -5,7 +5,14 @@
 # the uncompressed files. In this way the archive is only uncompressed once as
 # the timestamp of the archive is older.
 
-$(PACKAGE_ARCHIVE_PATH)/configure: $(WORKBENCH_PATH)/$(PACKAGE_ARCHIVE)
+# $(PACKAGE_ARCHIVE_UNCOMPRESSED_FILE) is the relative path to a file in the
+# uncompressed archive. It is used to determine whether the archive has to be
+# uncompressed.
+#
+# Most archives contain a single directory. This relative path does not include
+# that directory.
+
+$(PACKAGE_ARCHIVE_PATH)/$(PACKAGE_ARCHIVE_UNCOMPRESSED_FILE): $(WORKBENCH_PATH)/$(PACKAGE_ARCHIVE)
 	# Uncompress $(PACKAGE) source package
 	$(PACKAGE_UNCOMPRESS_COMMAND)
 	@touch $@

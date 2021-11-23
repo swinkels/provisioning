@@ -1,6 +1,8 @@
 # -*- mode: Makefile -*-
 # -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
 
+PACKAGE_ARCHIVE_UNCOMPRESSED_FILE=$(PACKAGE_ARCHIVE_TARGET)
+
 install-$(PACKAGE)-to-stow: $(PACKAGE_ARCHIVE_TARGET_PATH)
 	# Create directory to contain main binary, script etc. in Stow subdirectory
 	mkdir -p $(PACKAGE_STOW_PATH)/$(dir $(PACKAGE_STOW_TARGET))
