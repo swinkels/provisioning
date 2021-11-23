@@ -11,11 +11,4 @@ $(PACKAGE_ARCHIVE_TARGET_PATH): $(PACKAGE_ARCHIVE_PATH)/configure
 	# Build $(PACKAGE)
 	cd $(PACKAGE_ARCHIVE_PATH) && make
 
-# The next target also updates the timestamp of the target file, which is one of
-# the uncompressed files. In this way the archive is only uncompressed once as
-# the timestamp of the archive is older.
-
-$(PACKAGE_ARCHIVE_PATH)/configure: $(WORKBENCH_PATH)/$(PACKAGE_ARCHIVE)
-	# Uncompress $(PACKAGE) source package
-	tar xzf $< -C $(WORKBENCH_PATH)
-	@touch $@
+include Makefile.uncompress
