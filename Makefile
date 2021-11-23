@@ -162,36 +162,6 @@ pipx: ~/.local/bin/pipx
 	# Install pipx using pip
 	$(PYTHON) -m pip install --user pipx
 
-# ** restic
-
-.PHONY: restic
-
-RESTIC_VERSION=0.12.1
-RESTIC_ARCHIVE_DIR=restic_$(RESTIC_VERSION)_linux_amd64
-RESTIC_ARCHIVE=$(RESTIC_ARCHIVE_DIR).bz2
-
-restic: ~/.local/bin/restic
-
-~/.local/bin/restic: $(STOW_DIR)/restic-${RESTIC_VERSION}/bin/restic
-	# Install restic using Stow
-	stow restic-${RESTIC_VERSION} && touch $@
-
-$(STOW_DIR)/restic-${RESTIC_VERSION}/bin/restic: $(PACKAGE_DIR)/$(RESTIC_ARCHIVE_DIR)
-	# Copy restic binary to Stow directory
-	mkdir -p $(STOW_DIR)/restic-${RESTIC_VERSION}/bin && cp $< $@
-	# Allow execution of restic binary
-	chmod u+x $@
-	# Restrict access to restic binary
-	chmod g-wx $@ && chmod o-wx $@
-
-$(PACKAGE_DIR)/$(RESTIC_ARCHIVE_DIR): $(PACKAGE_DIR)/$(RESTIC_ARCHIVE)
-	# Uncompress restic archive
-	cd $(PACKAGE_DIR) && bzip2 --decompress --keep $(PACKAGE_DIR)/$(RESTIC_ARCHIVE)
-
-$(PACKAGE_DIR)/$(RESTIC_ARCHIVE):
-	# Download restic version $(RESTIC_VERSION)
-	wget $(WGET_OPTIONS) https://github.com/restic/restic/releases/download/v$(RESTIC_VERSION)/$(RESTIC_ARCHIVE)
-
 # ** spacemacs
 
 # Target ~spacemacs~ clones spacemacs and my spacemacs configuration to a custom
