@@ -8,5 +8,7 @@ install-$(PACKAGE)-to-stow: $(PACKAGE_ARCHIVE_TARGET_PATH)
 	mkdir -p $(PACKAGE_STOW_PATH)/$(dir $(PACKAGE_STOW_TARGET))
 	# Install $(PACKAGE) to Stow subdirectory
 	cp $(PACKAGE_ARCHIVE_TARGET_PATH) $(PACKAGE_STOW_PATH)/$(PACKAGE_STOW_TARGET)
+	# Allow execution of main binary, script etc.
+	chmod u+x $(PACKAGE_STOW_PATH)/$(PACKAGE_STOW_TARGET)
 
 include Makefile.uncompress
