@@ -48,7 +48,7 @@ PACKAGE_ARCHIVE_TARGET_PATH=$(PACKAGE_ARCHIVE_PATH)/$(PACKAGE_ARCHIVE_TARGET)
 
 .PHONY: $(PACKAGE) $(PACKAGE)-uninstall install-$(PACKAGE)-to-stow
 
-$(PACKAGE): ~/.local/$(PACKAGE_STOW_TARGET)
+$(PACKAGE): ~/.local/$(PACKAGE_STOW_TARGET) $(PACKAGE_POSTPROCESS_TARGETS)
 
 # The next target is a symlink. Note that to compare modification times (of
 # target and prerequisites), ~make~ looks at the mtime of the /destination of

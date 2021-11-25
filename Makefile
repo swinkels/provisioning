@@ -272,45 +272,6 @@ $(PACKAGE_DIR)/$(STOW_ARCHIVE):
 	# Download stow source package to the packages directory
 	wget $(WGET_OPTIONS) https://ftp.gnu.org/gnu/stow/$(STOW_ARCHIVE)
 
-# ** yadm
-
-.PHONY: yadm
-
-YADM_VERSION=2.4.0
-YADM_NAME_VERSION=yadm-$(YADM_VERSION)
-YADM_ARCHIVE_DIR=yadm-$(YADM_VERSION)
-YADM_ARCHIVE=$(YADM_VERSION).tar.gz
-
-yadm: ~/.local/bin/yadm ~/.config/yadm/repo.git
-
-~/.local/bin/yadm: $(STOW_DIR)/$(YADM_NAME_VERSION)/bin/yadm
-	# Install yadm using Stow
-	stow $(YADM_NAME_VERSION) && touch $@
-
-$(STOW_DIR)/$(YADM_ARCHIVE_DIR)/bin/yadm: $(PACKAGE_DIR)/$(YADM_NAME_VERSION)-no-retrieve
-	# Copy yadm script to Stow directory
-	mkdir -p $(STOW_DIR)/$(YADM_NAME_VERSION)/bin && cp $(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm $@
-	# Allow execution of yadm script
-	chmod u+x $@
-	# Restrict access to yadm script
-	chmod g-rwx $@ && chmod o-rwx $@
-
-$(PACKAGE_DIR)/$(YADM_NAME_VERSION)-no-retrieve:
-	@$(MAKE) --no-print-directory $(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm
-	@touch $@
-
-$(PACKAGE_DIR)/$(YADM_ARCHIVE_DIR)/yadm: $(PACKAGE_DIR)/$(YADM_ARCHIVE)
-	# Uncompress yadm archive
-	tar xzf $< -C $(PACKAGE_DIR)
-
-$(PACKAGE_DIR)/$(YADM_ARCHIVE):
-	# Download yadm version $(YADM_VERSION)
-	wget $(WGET_OPTIONS) https://github.com/TheLocehiliosan/yadm/archive/refs/tags/$(YADM_ARCHIVE)
-
-~/.config/yadm/repo.git:
-	# Let yadm clone my personal set of dotfiles
-	yadm clone https://github.com/swinkels/yadm-dotfiles.git
-
 # ** zsh
 
 .PHONY: zsh oh-my-zsh

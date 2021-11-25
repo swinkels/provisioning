@@ -1,0 +1,20 @@
+# -*- mode: Makefile -*-
+# -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
+
+# This file defines
+#
+# - the variables needed to retrieve and install yadm and
+# - the extra target to retrieve and install my personal set of dotfiles.
+
+PACKAGE_VERSION=2.4.0
+PACKAGE_URL=https://github.com/TheLocehiliosan/yadm/archive/refs/tags/yadm-$(PACHAGE_VERSION).tar.gz
+PACKAGE_TYPE=uncompress-copy
+PACKAGE_ARCHIVE_DIR=yadm-$(PACKAGE_VERSION)
+PACKAGE_ARCHIVE_TARGET=yadm
+PACKAGE_STOW_TARGET=bin/yadm
+
+PACKAGE_POSTPROCESS_TARGETS=~/.config/yadm/repo.git
+
+~/.config/yadm/repo.git:
+	# Let yadm clone my personal set of dotfiles
+	yadm clone https://github.com/swinkels/yadm-dotfiles.git
