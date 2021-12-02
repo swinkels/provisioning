@@ -21,7 +21,7 @@ WORKBENCH_PATH=$(HOME)/tmp/packages-workbench
 
 CONFIGURE_OPTIONS=CPPFLAGS=-I$(HOME)/.local/include LDFLAGS="-L$(HOME)/.local/lib -Wl,-rpath,$(HOME)/.local/lib"
 
-WGET_OPTIONS=--directory-prefix=$(PACKAGE_DIR) --quiet --timestamping
+WGET_OPTIONS=--directory-prefix=$(WORKBENCH_PATH) --quiet --timestamping
 
 # ~configure~ looks at the path of environment variable ~PKG_CONFIG_PATH~ to
 # determine which libraries are available. As we install some libraries locally,
