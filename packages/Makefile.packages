@@ -1,7 +1,7 @@
 # -*- mode: Makefile -*-
 # -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
 
-AVAILABLE_PACKAGES=cmake curl git jansson keychain libtool mob restic ripgrep tmux yadm zsh
+AVAILABLE_PACKAGES=cmake curl direnv git jansson keychain libtool mob restic ripgrep tmux yadm zsh
 
 # multiline value that specifies dependencies between top-level targets
 define PACKAGE_DEPENDENCIES

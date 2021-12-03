@@ -1,0 +1,12 @@
+# -*- mode: Makefile -*-
+# -*- eval: (outline-minor-mode); outline-regexp: "# [*]+"; -*-
+
+# This file defines the variables needed to retrieve, build and install curl.
+
+PACKAGE_VERSION=2.29.0
+PACKAGE_URL=https://github.com/direnv/direnv/releases/download/v$(PACKAGE_VERSION)/direnv.linux-amd64
+PACKAGE_TYPE=copy
+# the archive doesn't have a root directory
+# PACKAGE_ARCHIVE_DIR=
+PACKAGE_ARCHIVE_TARGET=direnv.linux-amd64
+PACKAGE_STOW_TARGET=bin/direnv
