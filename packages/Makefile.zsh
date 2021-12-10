@@ -21,15 +21,19 @@ PACKAGE_POSTPROCESS_TARGETS=call-zsh-from-bash-profile $(HOME)/.oh-my-zsh
 .PHONY: call-zsh-from-bash-profile
 
 # The following variable contains the commands to start zsh from the bash
-# profile. This is a workaround if you cannot use ~chsh~ to set the shell
-# (https://unix.stackexchange.com/a/136424).
+# profile. This is a workaround if you cannot use ~chsh~ to set the shell.
+#
+# This workaround is from https://unix.stackexchange.com/a/136424 and companion
+# answer https://unix.stackexchange.com/a/136511 - the latter to excempt
+# non-interactive shells.
 
 # How to define (and use) a multiline variable in a Makefile is from
 # https://stackoverflow.com/a/649462.
 define EXEC_LOCAL_ZSH
-export SHELL=~/.local/bin/zsh
-[ -z "$$ZSH_VERSION" ] && exec "$$SHELL" -l
-
+# start Zsh but only for interactive shells
+case "$-" in
+    *i*) [ -z "$$ZSH_VERSION" ] && export SHELL=~/.local/bin/zsh && exec "$$SHELL" -l
+esac
 endef
 BASH_PROFILE=$(HOME)/.bash_profile
 
