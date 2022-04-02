@@ -196,7 +196,7 @@ $(SPACEMACS_STOW_DIR)/.emacs.d:
 	# Clone spacemacs to its Stow directory
 	git clone https://github.com/syl20bnr/spacemacs $@
 	# Checkout the develop branch at the correct commit
-	cd $@ && git reset --hard $(SPACEMACS_COMMIT)
+	cd $@ && git checkout $(SPACEMACS_COMMIT)
 
 $(SPACEMACS_STOW_DIR)/.spacemacs.d:
 	# Clone my spacemacs config to its Stow directory
