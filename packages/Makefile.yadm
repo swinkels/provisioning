@@ -7,7 +7,7 @@
 # - the extra target to retrieve and install my personal set of dotfiles.
 
 PACKAGE_VERSION=2.4.0
-PACKAGE_URL=https://github.com/TheLocehiliosan/yadm/archive/refs/tags/yadm-$(PACHAGE_VERSION).tar.gz
+PACKAGE_URL=https://github.com/TheLocehiliosan/yadm/archive/refs/tags/$(PACKAGE_VERSION).tar.gz
 PACKAGE_TYPE=uncompress-copy
 PACKAGE_ARCHIVE_DIR=yadm-$(PACKAGE_VERSION)
 PACKAGE_ARCHIVE_TARGET=yadm
