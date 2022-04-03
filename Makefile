@@ -176,7 +176,7 @@ pipx: ~/.local/bin/pipx
 
 .PHONY: spacemacs spacemacs-unstow
 
-SPACEMACS_COMMIT=97af6fa
+SPACEMACS_COMMIT=587f584eb
 SPACEMACS_STOW_DIR=$(GIT_REPOS_DIR)/spacemacs-production
 
 # spacemacs uses emacs-libterm, which needs cmake and libtool to build some of its
