@@ -10,8 +10,8 @@ export STOW_DIR=$(HOME)/.local/stow
 endif
 
 LOCAL_FONTS_DIR=$(HOME)/.local/share/fonts
-LOCAL_GITHUB_REPOS_DIR=$(HOME)/repos/github.com
-GIT_REPOS_DIR=$(HOME)/repos/git
+LOCAL_GITHUB_REPOS_DIR=$(HOME)/repos/swinkels
+GIT_REPOS_DIR=$(HOME)/repos/swinkels
 
 # the following line to find the directory of this Makefile is from here:
 # https://stackoverflow.com/a/23324703
