@@ -6,7 +6,7 @@
 # - the variables needed to retrieve and install yadm and
 # - the extra target to retrieve and install my personal set of dotfiles.
 
-PACKAGE_VERSION=5.8
+PACKAGE_VERSION=5.9
 PACKAGE_URL=https://www.zsh.org/pub/zsh-$(PACKAGE_VERSION).tar.xz
 PACKAGE_TYPE=configure
 # The default uncompress command expects .tar.gz archives. As the Zsh archive is
