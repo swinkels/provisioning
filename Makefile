@@ -57,9 +57,10 @@ $(AVAILABLE_PACKAGES:%=%-uninstall): %:
 # should see a performance boost. Target ~jansson~ downloads, builds and
 # installs that C library.
 
-EMACS_VERSION=27.1
+EMACS_VERSION=28.2
 EMACS_ARCHIVE_DIR=emacs-$(EMACS_VERSION)
 EMACS_ARCHIVE=$(EMACS_ARCHIVE_DIR).tar.gz
+EMACS_EXTRA_CONFIGURE_OPTIONS=--with-gif=ifavailable
 
 ifeq ($(PROVISIONING_ENV), Nunhems)
 EMACS_EXTRA_CONFIGURE_OPTIONS= \
